@@ -1,3 +1,9 @@
+# Team set gitignore
+node_modules/
+
+
+# Default python .gitignore
+# =============================================== #
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
