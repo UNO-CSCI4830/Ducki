@@ -14,7 +14,7 @@ pip install fastapi pydantic uvicorn langchain langchain-openai openai python-do
 
 :: Node.js requirements
 echo Installing Node.js dependencies...
-npm install  :: This assumes that package.json is in the root directory
+npm install axios express http-proxy-middleware body-parser  :: This assumes that package.json is in the root directory
 
 echo.
 echo Now you must manually execute the command:
