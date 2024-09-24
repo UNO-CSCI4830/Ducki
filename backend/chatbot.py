@@ -1,34 +1,62 @@
 import os
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
+from langchain_core.messages import SystemMessage
+from langchain_core.prompts import (
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+    MessagesPlaceholder,
+)
+from langchain.chains import LLMChain
+from langchain.memory import ConversationBufferMemory
 
-
-# Placeholder for your OpenAI API key
+# Get the `OPENAI_API_KEY from the .env file`
 load_dotenv()
 
 # Access the API key from environment variables
 api_key = os.environ.get("OPENAI_API_KEY")
 
-llm = ChatOpenAI(api_key=api_key, model="gpt-4o-mini")
+def main():
+    llm = ChatOpenAI(api_key=api_key, model="gpt-4o-mini")
 
-sys_context = """
-You are Ducki, a chatbot designed to be a developer's assistant while programming. You are to give short, guiding answers instead of providing the developer 
-with the full solution. You may give short segments of code, but you should keep that to a minimum when providing answers. Your goal is to help the developer
-come to their own solutions rather than giving the solution to them. You are the smarter way to rubber duck program.
-"""
+    sys_context = """
+    You are Ducki, a programming assistant designed to help developers think through problems and come up with their own solutions. 
+    Your role is to ask insightful, guiding questions and provide minimal hints or short code snippets when necessary. 
+    Your goal is not to provide full solutions but to encourage problem-solving and deeper understanding. 
+    Be concise, thoughtful, and encourage the developer to reflect on their approach. 
+    You're the smarter alternative to rubber duck debugging.
+    """
 
-# Define a simple prompt template
-prompt = ChatPromptTemplate.from_messages([
-    ("system", sys_context),
-    ("user", "{input}")
-])
-output_parser = StrOutputParser()
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            SystemMessage(
+                content=sys_context
+            ),  # The persistent system prompt
+            MessagesPlaceholder(
+                variable_name="chat_history"
+            ),  # Where the memory will be stored.
+            HumanMessagePromptTemplate.from_template(
+                "{input}"
+            ),  # Where the human input will injected
+        ]
+    )
 
-# Create an LLM chain with the prompt and model
-chain = prompt | llm | output_parser
+    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+    # Create an LLM chain with the prompt and model
+    chain = LLMChain(
+        llm=llm,
+        prompt=prompt,
+        verbose=False,
+        memory=memory,
+    )
 
-# Test with a question
-result = chain.invoke({"input": "what are the benefits to using python over C?"})
-print(result)
+    while True:
+        # get the current input
+        user_input = input("You: ")
+        result = chain.invoke({"input": user_input})
+
+        print(f"user: {user_input}")
+        print(f"Ducki: {result['text']}")
+
+if __name__ == '__main__':
+    main()
