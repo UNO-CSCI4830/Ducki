@@ -9,8 +9,10 @@ echo "Upgrading pip..."
 pip install --upgrade pip
 
 echo "Installing Python packages..."
-pip install fastapi pydantic uvicorn langchain --default-timeout=100
+pip install fastapi pydantic uvicorn langchain langchain-openai openai python-dotenv --default-timeout=100
 
 # Node.js requirements
 echo "Installing Node.js dependencies..."
 npm install  # This assumes that package.json is in the root directory
+
+echo "\n\nNow you must manually execute the command:\n\n\tsource .env\n\n"
