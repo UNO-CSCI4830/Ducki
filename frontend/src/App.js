@@ -6,21 +6,24 @@ const Chatbot = () => {
     const [responses, setResponses] = useState([]);
 
     const sendMessage = async (e) => {
-        e.preventDefault();
-        if (message.trim() === '') return;
-
+        e.preventDefault();  // Prevents page reload on form submit
+        if (message.trim() === '') return;  // Do nothing if the message is empty
+    
         try {
             const response = await axios.post('http://localhost:5000/api/message', {
-                text: message
+                text: message  // Send the user's message to the backend
             });
-            
-            // Add both the sent message and the response from the backend
+    
+            // Update 'responses' array by appending the new user message and the bot's response
             setResponses((prev) => [
-                ...prev,
-                { user: message, bot: response.data.confirmation }
+                ...prev,  // Spread the previous responses to retain the history
+                { 
+                    user: message,  // User's message
+                    bot: response.data.confirmation  // Bot's response from the backend
+                }
             ]);
-
-            // Clear the input after sending the message
+    
+            // Clear the input field after the message is sent
             setMessage('');
         } catch (error) {
             console.error('Error communicating with backend', error);
