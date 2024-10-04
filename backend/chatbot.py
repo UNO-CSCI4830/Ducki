@@ -10,6 +10,16 @@ from langchain_core.prompts import (
 from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
 
+
+"""
+SOMETHING TO ADD: 
+somewhere on the frontend, we should make a form that screens the user and writes the output to a file.
+We can then take that information and inject it into the prompt so that we can essentially create a 
+profile for the user. This can just be stored in a json file so that the user doesn't have to fill out 
+the form each time they open the app. There SHOULD be an option to retake the screening.
+"""
+
+
 # Get the `OPENAI_API_KEY from the .env file`
 load_dotenv()
 
