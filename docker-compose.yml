@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: ducki-backend
+    expose:
+      - "5000"  # Only expose port inside the Docker network, not to the host
+    restart: always
+
+  frontend:
+    build: 
+      context: ./frontend
+    container_name: ducki-frontend
+    ports:
+      - "3000:3000"  # Only expose the frontend on localhost
+    restart: always
+    depends_on:
+      - backend
