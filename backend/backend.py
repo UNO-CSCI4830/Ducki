@@ -1,14 +1,13 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
-
 from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Frontend URL
+    allow_origins=["*"],  # Allow all origins for now 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
