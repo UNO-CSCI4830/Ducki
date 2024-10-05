@@ -7,6 +7,8 @@ services:
     container_name: ducki-backend
     expose:
       - "5000"  # Only expose port inside the Docker network, not to the host
+    volumes:
+      - ./backend:/app/backend
     restart: always
 
   frontend:
@@ -15,6 +17,8 @@ services:
     container_name: ducki-frontend
     ports:
       - "3000:3000"  # Only expose the frontend on localhost
+    volumes:
+      - ./frontend:/app/frontend
     restart: always
     depends_on:
       - backend
