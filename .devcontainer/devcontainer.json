@@ -1,0 +1,20 @@
+{
+  "name": "Ducki Fullstack Dev Container",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "frontend", // Default service to attach to
+  "workspaceFolder": "/app", // Workspace folder for both frontend and backend
+  "settings": {
+      "terminal.integrated.shell.linux": "/bin/sh"
+  },
+  "extensions": [
+      "ms-python.python", // For Python development
+      "esbenp.prettier-vscode", // For code formatting
+      "dbaeumer.vscode-eslint", // For linting JavaScript/React code
+      "ms-azuretools.vscode-docker" // For Docker integration in VS Code
+  ],
+  "postCreateCommand": [
+      "npm install --prefix /app/frontend", // Install frontend dependencies
+      "pip install --no-cache-dir -r /app/backend/requirements.txt" // Install backend dependencies
+  ],
+  "shutdownAction": "stopCompose"
+}
