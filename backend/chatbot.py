@@ -19,7 +19,7 @@ profile for the user. This can just be stored in a json file so that the user do
 the form each time they open the app. There SHOULD be an option to retake the screening.
 """
 
-class Ducki:
+class Chatbot:
     def __init__(self, api_key: str):
         # Initialize the LLM with the provided API key
         self.llm = ChatOpenAI(api_key=api_key, model="gpt-4o-mini")
@@ -63,7 +63,7 @@ if __name__ == '__main__':
 
     # Access the API key from environment variables
     api_key = os.environ.get("OPENAI_API_KEY")
-    ducki = Ducki(api_key=api_key)
+    ducki = Chatbot(api_key=api_key)
 
     while True:
         # get the current input
