@@ -19,7 +19,7 @@ const Chatbot = () => {
         ...prev, // Spread the previous responses to retain the history
         {
           user: message, // User's message
-          bot: response.data.confirmation, // Bot's response from the backend
+          bot: response.data.response, // Bot's response from the backend
         },
       ]);
 
