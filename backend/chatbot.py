@@ -45,6 +45,9 @@ class Chatbot:
         # Initialize memory for conversation history
         self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
+        # Add a welcome message from the chatbot
+        self.memory.chat_memory.add_ai_message(self.send_init_message())       
+        
         # Create an LLM chain using the LLM, prompt, and memory
         self.chain = LLMChain(
             llm=self.llm,
@@ -52,6 +55,9 @@ class Chatbot:
             verbose=False,
             memory=self.memory,
         )
+
+    def send_init_message(self):
+        return "Hello, world! I am Ducki, your rubber-duck programming companion. How may I help?"
 
     def generate_response(self, user_input: str):
         response = self.chain.invoke({"input": user_input})
