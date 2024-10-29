@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
+import './App.css'
+import Ducki from './assets/ducki.ico'
+
+
 
 const Chatbot = () => {
   const [message, setMessage] = useState("");
@@ -33,6 +37,9 @@ const Chatbot = () => {
   return (
     <div>
       <h1>Ducki Chatbot</h1>
+      <div className= 'DuckiImage'>
+        <img src={Ducki}/>
+      </div>
       <div>
         {responses.map((res, index) => (
           <div key={index}>
@@ -50,7 +57,7 @@ const Chatbot = () => {
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type a message"
+          placeholder="Type a message to Ducki"
         />
         <button type="submit">Send</button>
       </form>
