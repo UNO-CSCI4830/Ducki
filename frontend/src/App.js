@@ -29,7 +29,7 @@ const Chatbot = () => {
 
   return (
     <div>
-      <h1>Ducki</h1>
+      <h1 className="">Ducki</h1>
       <div>
         {recentResponse && (
           <div>
