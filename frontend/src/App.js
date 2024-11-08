@@ -7,10 +7,10 @@ import Ducki from './assets/ducki.ico'
 
 const Chatbot = () => {
   const [message, setMessage] = useState("");
-  const [responses, setResponses] = useState([]);
+  const [recentResponse, setRecentResponse] = useState(null);
 
   const sendMessage = async (e) => {
-    e.preventDefault(); // Prevents page reload on form submit
+    e.preventDefault(); 
     if (message.trim() === "") return; // Do nothing if the message is empty
 
     try {
@@ -18,14 +18,11 @@ const Chatbot = () => {
         text: message,
       });
 
-      // Update 'responses' array by appending the new user message and the bot's response
-      setResponses((prev) => [
-        ...prev, // Spread the previous responses to retain the history
-        {
-          user: message, // User's message
-          bot: response.data.confirmation, // Bot's response from the backend
-        },
-      ]);
+      // Update the 'recentResponse' state with the new user message and bot's response
+      setRecentResponse({
+        user: message, // User message
+        bot: response.data.response, // Ducki's response
+      });
 
       // Clear the input field after the message is sent
       setMessage("");
@@ -35,38 +32,30 @@ const Chatbot = () => {
   };
 
   return (
-    <html>
-      <body>
-        <div class="container">
-          <h1 align="center" color="white">Ducki Chatbot</h1>
-          <div className='DuckiImage'>
-            <img src={Ducki}/>
-          </div>
+    <div>
+      <h1 className="">Ducki</h1>
+      <div>
+        {recentResponse && (
           <div>
-            {responses.map((res, index) => (
-              <div key={index}>
-                <p>
-                  <strong>You:</strong> {res.user}
-                </p>
-                <p>
-                  <strong>Ducki:</strong> {res.bot}
-                </p>
-              </div>
-            ))}
+            <p>
+              <strong>You:</strong> {recentResponse.user}
+            </p>
+            <p>
+              <strong>Ducki:</strong> {recentResponse.bot}
+            </p>
           </div>
-          <div class="bottom-div">
-            <form align="center" onSubmit={sendMessage}>
-              <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Type a message to Ducki" />
-              <button type="submit">Send</button>
-            </form>
-          </div>
-        </div>
-      </body>
-    </html>
+        )}
+      </div>
+      <form onSubmit={sendMessage}>
+        <input
+          type="text"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Type a message"
+        />
+        <button type="submit">Send</button>
+      </form>
+    </div>
   );
 };
 
