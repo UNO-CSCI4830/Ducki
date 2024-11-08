@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
+import './App.css'
+import Ducki from './assets/ducki.ico'
+
+
 
 const Chatbot = () => {
   const [message, setMessage] = useState("");
