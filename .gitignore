@@ -1,6 +1,6 @@
 # Team set gitignore
 node_modules/
-.env
+backend/.env
 venv/
 
 # Default python .gitignore

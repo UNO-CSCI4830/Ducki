@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 import axios from "axios";
+import './App.css'
+import Ducki from './assets/ducki.ico'
+
+
 
 const Chatbot = () => {
   const [message, setMessage] = useState("");
-  const [responses, setResponses] = useState([]);
+  const [recentResponse, setRecentResponse] = useState(null);
 
   const sendMessage = async (e) => {
-    e.preventDefault(); // Prevents page reload on form submit
+    e.preventDefault(); 
     if (message.trim() === "") return; // Do nothing if the message is empty
 
     try {
@@ -14,14 +18,11 @@ const Chatbot = () => {
         text: message,
       });
 
-      // Update 'responses' array by appending the new user message and the bot's response
-      setResponses((prev) => [
-        ...prev, // Spread the previous responses to retain the history
-        {
-          user: message, // User's message
-          bot: response.data.confirmation, // Bot's response from the backend
-        },
-      ]);
+      // Update the 'recentResponse' state with the new user message and bot's response
+      setRecentResponse({
+        user: message, // User message
+        bot: response.data.response, // Ducki's response
+      });
 
       // Clear the input field after the message is sent
       setMessage("");
@@ -32,18 +33,18 @@ const Chatbot = () => {
 
   return (
     <div>
-      <h1>Ducki Chatbot</h1>
+      <h1 className="">Ducki</h1>
       <div>
-        {responses.map((res, index) => (
-          <div key={index}>
+        {recentResponse && (
+          <div>
             <p>
-              <strong>You:</strong> {res.user}
+              <strong>You:</strong> {recentResponse.user}
             </p>
             <p>
-              <strong>Ducki:</strong> {res.bot}
+              <strong>Ducki:</strong> {recentResponse.bot}
             </p>
           </div>
-        ))}
+        )}
       </div>
       <form onSubmit={sendMessage}>
         <input

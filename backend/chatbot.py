@@ -19,54 +19,62 @@ profile for the user. This can just be stored in a json file so that the user do
 the form each time they open the app. There SHOULD be an option to retake the screening.
 """
 
+class Chatbot:
+    def __init__(self, api_key: str):
+        # Initialize the LLM with the provided API key
+        self.llm = ChatOpenAI(api_key=api_key, model="gpt-4o-mini")
+        
+        # Define the system context for the assistant
+        self.sys_context = """
+        You are Ducki, a programming assistant designed to help developers think through problems and come up with their own solutions. 
+        Your role is to ask insightful, guiding questions and provide minimal hints or short code snippets when necessary. 
+        Your goal is not to provide full solutions but to encourage problem-solving and deeper understanding. 
+        Be concise, thoughtful, and encourage the developer to reflect on their approach. 
+        You're the smarter alternative to rubber duck debugging.
+        """
+        
+        # Create a prompt template using system context and placeholders
+        self.prompt = ChatPromptTemplate.from_messages(
+            [
+                SystemMessage(content=self.sys_context),  # System message
+                MessagesPlaceholder(variable_name="chat_history"),  # Memory placeholder
+                HumanMessagePromptTemplate.from_template("{input}"),  # User input placeholder
+            ]
+        )
 
-# Get the `OPENAI_API_KEY from the .env file`
-load_dotenv()
+        # Initialize memory for conversation history
+        self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
-# Access the API key from environment variables
-api_key = os.environ.get("OPENAI_API_KEY")
+        # Add a welcome message from the chatbot
+        self.memory.chat_memory.add_ai_message(self.send_init_message())       
+        
+        # Create an LLM chain using the LLM, prompt, and memory
+        self.chain = LLMChain(
+            llm=self.llm,
+            prompt=self.prompt,
+            verbose=False,
+            memory=self.memory,
+        )
 
-def main():
-    llm = ChatOpenAI(api_key=api_key, model="gpt-4o-mini")
+    def send_init_message(self):
+        return "Hello, world! I am Ducki, your rubber-duck programming companion. How may I help?"
 
-    sys_context = """
-    You are Ducki, a programming assistant designed to help developers think through problems and come up with their own solutions. 
-    Your role is to ask insightful, guiding questions and provide minimal hints or short code snippets when necessary. 
-    Your goal is not to provide full solutions but to encourage problem-solving and deeper understanding. 
-    Be concise, thoughtful, and encourage the developer to reflect on their approach. 
-    You're the smarter alternative to rubber duck debugging.
-    """
+    def generate_response(self, user_input: str):
+        response = self.chain.invoke({"input": user_input})
+        return response['text']
 
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            SystemMessage(
-                content=sys_context
-            ),  # The persistent system prompt
-            MessagesPlaceholder(
-                variable_name="chat_history"
-            ),  # Where the memory will be stored.
-            HumanMessagePromptTemplate.from_template(
-                "{input}"
-            ),  # Where the human input will injected
-        ]
-    )
+if __name__ == '__main__':
+    # Get the `OPENAI_API_KEY from the .env file`
+    load_dotenv()
 
-    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-    # Create an LLM chain with the prompt and model
-    chain = LLMChain(
-        llm=llm,
-        prompt=prompt,
-        verbose=False,
-        memory=memory,
-    )
+    # Access the API key from environment variables
+    api_key = os.environ.get("OPENAI_API_KEY")
+    ducki = Chatbot(api_key=api_key)
 
     while True:
         # get the current input
         user_input = input("You: ")
-        result = chain.invoke({"input": user_input})
+        response = ducki.generate_response(user_input)
 
         print(f"user: {user_input}")
-        print(f"Ducki: {result['text']}")
-
-if __name__ == '__main__':
-    main()
+        print(f"Ducki: {response}")
