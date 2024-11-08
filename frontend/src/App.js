@@ -35,33 +35,38 @@ const Chatbot = () => {
   };
 
   return (
-    <div>
-      <h1>Ducki Chatbot</h1>
-      <div className= 'DuckiImage'>
-        <img src={Ducki}/>
-      </div>
-      <div>
-        {responses.map((res, index) => (
-          <div key={index}>
-            <p>
-              <strong>You:</strong> {res.user}
-            </p>
-            <p>
-              <strong>Ducki:</strong> {res.bot}
-            </p>
+    <html>
+      <body>
+        <div class="container">
+          <h1 align="center" color="white">Ducki Chatbot</h1>
+          <div className='DuckiImage'>
+            <img src={Ducki}/>
           </div>
-        ))}
-      </div>
-      <form onSubmit={sendMessage}>
-        <input
-          type="text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type a message to Ducki"
-        />
-        <button type="submit">Send</button>
-      </form>
-    </div>
+          <div>
+            {responses.map((res, index) => (
+              <div key={index}>
+                <p>
+                  <strong>You:</strong> {res.user}
+                </p>
+                <p>
+                  <strong>Ducki:</strong> {res.bot}
+                </p>
+              </div>
+            ))}
+          </div>
+          <div class="bottom-div">
+            <form align="center" onSubmit={sendMessage}>
+              <input
+                type="text"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Type a message to Ducki" />
+              <button type="submit">Send</button>
+            </form>
+          </div>
+        </div>
+      </body>
+    </html>
   );
 };
 
