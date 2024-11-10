@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import ReactMarkdown from "react-markdown"; // Import react-markdown
 import './App.css';
 import Ducki from './assets/ducki.ico';
 
@@ -9,20 +10,18 @@ const Chatbot = () => {
 
   const sendMessage = async (e) => {
     e.preventDefault(); 
-    if (message.trim() === "") return; // Do nothing if the message is empty
+    if (message.trim() === "") return;
 
     try {
       const response = await axios.post("/api/message", {
         text: message,
       });
 
-      // Update the 'recentResponse' state with the new user message and bot's response
       setRecentResponse({
-        user: message, // User message
-        bot: response.data.response, // Ducki's response
+        user: message,
+        bot: response.data.response,
       });
 
-      // Clear the input field after the message is sent
       setMessage("");
     } catch (error) {
       console.error("Error communicating with backend", error);
@@ -42,7 +41,8 @@ const Chatbot = () => {
               <strong>You:</strong> {recentResponse.user}
             </p>
             <p>
-              <strong>Ducki:</strong> {recentResponse.bot}
+              <strong>Ducki:</strong>
+              <ReactMarkdown>{recentResponse.bot}</ReactMarkdown>
             </p>
           </div>
         )}
