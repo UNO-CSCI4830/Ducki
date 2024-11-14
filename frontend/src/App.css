@@ -13,6 +13,35 @@
   }
 }
 
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #33363b;
+  min-height: 100vh;
+  min-width: 100vw;
+}
+
+.DuckiImage img {
+  position: absolute;
+  height: auto;
+  width: 10%;
+  bottom: 15%;
+  left: 20%;
+}
+
+h1 {
+  color: #fee88f;
+  width: 33vw;
+  height: 10vh;
+}
+
+.bottom-div {
+  margin-top: auto;
+  padding-bottom: 5%;
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -28,6 +57,13 @@
   color: #61dafb;
 }
 
+input[type=text] {
+  background-color: #fee88f;
+  width: 66vw;
+  height: 3vh;
+  text-align: center;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -35,4 +71,57 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Settings Button */
+.settings-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.settings-button:hover {
+  background-color: #45a049;
+}
+
+/* Modal (popup) styling */
+.settings-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.settings-modal h2 {
+  margin-top: 0;
+}
+
+.settings-modal button {
+  background-color: #f44336; /* Red color */
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 14px; /* Adjust as needed */
+}
+
+/* Hover Effect: Change the color when mouse is over the button */
+.settings-modal button:hover {
+  background-color: #e53935; /* Darker red color on hover */
+  transform: scale(1.05);  /* Slightly enlarge the button on hover */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition */
 }
