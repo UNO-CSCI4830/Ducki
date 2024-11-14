@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 from chatbot import Chatbot
+from time import sleep
 
 app = FastAPI()
 
@@ -16,10 +17,18 @@ ducki = Chatbot(api_key=api_key)
 class Message(BaseModel):
     text: str
 
+@app.get("/api/init_message")
+async def send_init_message():
+    response = {
+        "response":f"{ducki.send_init_message}"
+    }
+    return JSONResponse(content=response, status_code=200)
+
 @app.post("/api/message")
 async def receive_message(message: Message):
     print(f"Received message: {message.text}")
     bot_response = ducki.generate_response(message.text)
+    sleep(1)
     response = {
         "response": f"{bot_response}"
     }
