@@ -4,9 +4,10 @@ import './App.css';
 import Ducki from './assets/ducki.ico';
 
 const Chatbot = () => {
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState("");  
   const [recentResponse, setRecentResponse] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [bgColor, setBgColor] = useState("#33363b"); // Initial background color is white
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -32,13 +33,18 @@ const Chatbot = () => {
     setShowSettings(false);
   };
 
+  // Toggle background color between black and white
+  const toggleBackgroundColor = () => {
+    setBgColor(prevColor => prevColor === "white" ? "#33363b" : "white");
+  };
+
   return (
-    <div className="container">
+    <div className="container" style={{ backgroundColor: bgColor }}> {/* Apply dynamic background color */}
       <button className="settings-button" onClick={toggleSettings}>
         ⚙️ Settings
       </button>
 
-      <h1 align="center" style={{ color: "white" }}>Ducki Chatbot</h1>
+      <h1 align="center" style={{ color: bgColor === "white" ? "black" : "white" }}>Ducki Chatbot</h1>
 
       <div className="DuckiImage">
         <img src={Ducki} alt="Ducki icon" />
@@ -70,9 +76,12 @@ const Chatbot = () => {
         <div className="settings-modal">
           <h2>Settings</h2>
           <p>Adjust your settings here.</p>
-          <p>Background theme</p>
-          <p>API Key</p>
-          <p>Fun easter egg</p>
+          <div>
+            <label>Select Background Color:</label>
+            <button onClick={toggleBackgroundColor}>
+              Toggle to {bgColor === "white" ? "Black" : "White"}
+            </button>
+          </div>
           <button onClick={closeSettings}>Cancel</button>
         </div>
       )}
