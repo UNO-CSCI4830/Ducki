@@ -8,6 +8,8 @@ const Chatbot = () => {
   const [recentResponse, setRecentResponse] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
   const [bgColor, setBgColor] = useState("#33363b");
+  const [apiKey, setApiKey] = useState("");
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -33,13 +35,31 @@ const Chatbot = () => {
     setShowSettings(false);
   };
 
-  // Toggle background color between black and white
+  const openApiKeyModal = () => {
+    setShowApiKeyModal(true);
+  };
+
+  const closeApiKeyModal = () => {
+    setShowApiKeyModal(false);
+    setApiKey(""); // Clear API key input on cancel
+  };
+
+  const handleApiKeyChange = (e) => {
+    setApiKey(e.target.value);
+  };
+
+  const saveApiKey = () => {
+    console.log("API Key saved:", apiKey);
+    setShowApiKeyModal(false);
+    setApiKey(""); // Clear API key input after saving
+  };
+
   const toggleBackgroundColor = () => {
     setBgColor(prevColor => prevColor === "white" ? "#33363b" : "white");
   };
 
   return (
-    <div className="container" style={{ backgroundColor: bgColor }}> {/* Apply dynamic background color */}
+    <div className="container" style={{ backgroundColor: bgColor }}>
       <button className="settings-button" onClick={toggleSettings}>
         ⚙️ Settings
       </button>
@@ -71,7 +91,6 @@ const Chatbot = () => {
         </form>
       </div>
 
-      {/* Settings Modal */}
       {showSettings && (
         <div className="settings-modal">
           <h2>Settings</h2>
@@ -79,10 +98,27 @@ const Chatbot = () => {
           <div>
             <label>Select Background Color:</label>
             <button onClick={toggleBackgroundColor}>
-              Toggle to {bgColor === "white" ? "Black" : "White"}
+              Toggle to {bgColor === "white" ? "#33363b" : "White"}
             </button>
           </div>
+          <div>
+            <button onClick={openApiKeyModal}>Input API Key</button>
+          </div>
           <button onClick={closeSettings}>Cancel</button>
+        </div>
+      )}
+
+      {showApiKeyModal && (
+        <div className="settings-modal">
+          <h2>Enter API Key</h2>
+          <input
+            type="text"
+            value={apiKey}
+            onChange={handleApiKeyChange}
+            placeholder="Enter your API key"
+          />
+          <button onClick={saveApiKey}>Save API Key</button>
+          <button onClick={closeApiKeyModal}>Cancel</button>
         </div>
       )}
     </div>
