@@ -7,7 +7,7 @@ const Chatbot = () => {
   const [message, setMessage] = useState("");  
   const [recentResponse, setRecentResponse] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
-  const [bgColor, setBgColor] = useState("#33363b"); // Initial background color is white
+  const [bgColor, setBgColor] = useState("#33363b");
 
   const sendMessage = async (e) => {
     e.preventDefault();
