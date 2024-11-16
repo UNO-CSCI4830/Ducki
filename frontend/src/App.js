@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import ReactMarkdown from "react-markdown";
 import './App.css';
 import Ducki from './assets/ducki.ico';
 
@@ -14,6 +15,11 @@ const Chatbot = () => {
   const sendMessage = async (e) => {
     e.preventDefault();
     if (message.trim() === "") return;
+    
+    setRecentResponse({
+      user: message,
+      bot:"",
+    })
 
     try {
       const response = await axios.post("/api/message", { text: message });
@@ -73,8 +79,13 @@ const Chatbot = () => {
       <div>
         {recentResponse && (
           <div>
-            <p><strong>You:</strong> {recentResponse.user}</p>
-            <p><strong>Ducki:</strong> {recentResponse.bot}</p>
+            <p>
+              <strong>You:</strong> {recentResponse.user}
+            </p>
+            <p>
+              <strong>Ducki:</strong>
+              <ReactMarkdown>{recentResponse.bot}</ReactMarkdown>
+            </p>
           </div>
         )}
       </div>

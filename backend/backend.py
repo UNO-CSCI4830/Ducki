@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 from chatbot import Chatbot
 from time import sleep
+import random
 
 app = FastAPI()
 
@@ -17,6 +18,10 @@ ducki = Chatbot(api_key=api_key)
 class Message(BaseModel):
     text: str
 
+@app.get("/api/api_key")
+async def get_api_key():
+    pass
+
 @app.get("/api/init_message")
 async def send_init_message():
     response = {
@@ -28,7 +33,7 @@ async def send_init_message():
 async def receive_message(message: Message):
     print(f"Received message: {message.text}")
     bot_response = ducki.generate_response(message.text)
-    sleep(1)
+    # sleep(random.random()*2) # delay for the sake of making it not appear instantly
     response = {
         "response": f"{bot_response}"
     }
