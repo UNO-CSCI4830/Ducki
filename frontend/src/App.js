@@ -51,11 +51,27 @@ const Chatbot = () => {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type a message"
+          style={{
+            marginBottom: '10px', 
+            padding: '8px',
+            fontSize: '16px',
+            borderRadius: '4px',
+            border: '1px solid #ccc',
+          }}
         />
-        <button type="submit">Send</button>
+        <button type="submit"
+          style={{border: 'none', background: 'none', padding: 0}}
+        >
+          <img
+            src="/Quack.svg"
+            alt=""
+            style={{marginRight: '100px', width: '200px', height: '200px',cursor: 'pointer',}}
+            onClick={sendMessage} 
+          />
+        </button>
       </form>
     </div>
-  );
+  ); 
 };
 
 export default Chatbot;
