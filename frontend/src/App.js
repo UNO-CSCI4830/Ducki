@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
-import './App.css';
-import Ducki from './assets/ducki.ico';
+import ReactMarkdown from "react-markdown";
+import "./App.css";
+import Ducki from "./assets/ducki.ico";
 
 const Chatbot = () => {
-  const [message, setMessage] = useState("");  
+  const [message, setMessage] = useState("");
   const [recentResponse, setRecentResponse] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
   const [bgColor, setBgColor] = useState("#33363b");
@@ -15,6 +16,11 @@ const Chatbot = () => {
     e.preventDefault();
     if (message.trim() === "") return;
 
+    setRecentResponse({
+      user: message,
+      bot: "",
+    });
+
     try {
       const response = await axios.post("/api/message", { text: message });
       setRecentResponse({
@@ -24,6 +30,24 @@ const Chatbot = () => {
       setMessage("");
     } catch (error) {
       console.error("Error communicating with backend", error);
+    }
+  };
+
+  const sendAPIKey = async (e) => {
+    e.preventDefault();
+
+    if (apiKey.trim() === "") {
+      console.error("API key is required");
+      return;
+    }
+
+    try {
+      const response = await axios.post("/api/api_key", { api_key: apiKey });
+      console.log("API key sent successfully:", response.data.message);
+      setShowApiKeyModal(false);
+      setApiKey(""); // Clear the API key input field after submission
+    } catch (error) {
+      console.error("Error sending API key to backend", error);
     }
   };
 
@@ -48,14 +72,8 @@ const Chatbot = () => {
     setApiKey(e.target.value);
   };
 
-  const saveApiKey = () => {
-    console.log("API Key saved:", apiKey);
-    setShowApiKeyModal(false);
-    setApiKey(""); // Clear API key input after saving
-  };
-
   const toggleBackgroundColor = () => {
-    setBgColor(prevColor => prevColor === "white" ? "#33363b" : "white");
+    setBgColor((prevColor) => (prevColor === "white" ? "#33363b" : "white"));
   };
 
   return (
@@ -64,7 +82,12 @@ const Chatbot = () => {
         ⚙️ Settings
       </button>
 
-      <h1 align="center" style={{ color: bgColor === "white" ? "black" : "white" }}>Ducki Chatbot</h1>
+      <h1
+        align="center"
+        style={{ color: bgColor === "white" ? "black" : "white" }}
+      >
+        Ducki Chatbot
+      </h1>
 
       <div className="DuckiImage">
         <img src={Ducki} alt="Ducki icon" />
@@ -73,8 +96,13 @@ const Chatbot = () => {
       <div>
         {recentResponse && (
           <div>
-            <p><strong>You:</strong> {recentResponse.user}</p>
-            <p><strong>Ducki:</strong> {recentResponse.bot}</p>
+            <p>
+              <strong>You:</strong> {recentResponse.user}
+            </p>
+            <p>
+              <strong>Ducki:</strong>
+              <ReactMarkdown>{recentResponse.bot}</ReactMarkdown>
+            </p>
           </div>
         )}
       </div>
@@ -111,14 +139,18 @@ const Chatbot = () => {
       {showApiKeyModal && (
         <div className="settings-modal">
           <h2>Enter API Key</h2>
-          <input
-            type="text"
-            value={apiKey}
-            onChange={handleApiKeyChange}
-            placeholder="Enter your API key"
-          />
-          <button onClick={saveApiKey}>Save API Key</button>
-          <button onClick={closeApiKeyModal}>Cancel</button>
+          <form onSubmit={sendAPIKey}>
+            <input
+              type="text"
+              value={apiKey}
+              onChange={handleApiKeyChange}
+              placeholder="Enter your API key"
+            />
+            <button type="submit">Save API Key</button>
+            <button type="button" onClick={closeApiKeyModal}>
+              Cancel
+            </button>
+          </form>
         </div>
       )}
     </div>

@@ -84,7 +84,6 @@ if __name__ == '__main__':
 
     ducki = Chatbot(api_key=api_key)
     
-    # Example loop for interaction
     while True:
         user_input = input("You: ")
         response = ducki.generate_response(user_input)
