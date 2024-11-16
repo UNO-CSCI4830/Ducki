@@ -1,3 +1,4 @@
+
 .App {
   text-align: center;
 }
@@ -125,3 +126,5 @@ input[type=text] {
   transform: scale(1.05);  /* Slightly enlarge the button on hover */
   transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition */
 }
+
+
