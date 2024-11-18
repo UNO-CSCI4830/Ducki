@@ -1,41 +1,44 @@
 from langchain_openai import ChatOpenAI
 
-def checkKey(key):
+class apiKeyHandler:
 
-    try:
-        llm = ChatOpenAI(api_key=key, model="gpt-4o-mini")
-        llm("Testing")
+    def checkKey(self,key):
 
-        #print("VALID API KEY")
-        return True
-    
-    except Exception as e:
-        #print("INVALID API KEY:", e)
-        return False
+        try:
+            llm = ChatOpenAI(api_key=key, model="gpt-4o-mini")
+            llm("Testing")
 
-def readKey():
+            #print("VALID API KEY")
+            return True
+        
+        except Exception as e:
+            #print("INVALID API KEY:", e)
+            return False
 
-    try:
-        with open('Ducki/backend/API_Key.txt',"r") as file:
-            contents = file.readlines()
-            key = contents[0].split()
-            key = key[1]
-            return key
-    
-    except FileNotFoundError as e:
-        return None
+    def readKey(self):
 
-def writeKey(key):
+        try:
+            with open('Ducki/backend/.env',"r") as file:
+                contents = file.readlines()
+                key = contents[0].split('=')
+                key = key[1]
+                return key
+        
+        except FileNotFoundError as e:
+            return None
 
-    with open('Ducki/backend/API_Key.txt','w') as file:
-        keyString = 'API_KEY: ' + key
-        file.write(keyString)
+    def writeKey(self,key):
+
+        with open('Ducki/backend/.env','w') as file:
+            keyString = 'OPENAI_API_KEY=' + key
+            file.write(keyString)
 
 def main():
 
     # Just testing writeKey() and readKey()
-    writeKey("kjldsfkjsfdkjlfdskljkljfsd") 
-    print(readKey())
+    apiHandler = apiKeyHandler()
+    
+
     
 
 if __name__ == '__main__':
