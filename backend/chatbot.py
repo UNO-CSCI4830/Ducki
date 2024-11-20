@@ -19,54 +19,75 @@ profile for the user. This can just be stored in a json file so that the user do
 the form each time they open the app. There SHOULD be an option to retake the screening.
 """
 
+class Chatbot:
+    def __init__(self, api_key: str):
+        self.api_key = api_key
+        self.llm = self.initialize_llm()
+        self.prompt = self.create_prompt_template()
+        self.memory = self.initialize_memory()
+        self.chain = self.create_chain()
 
-# Get the `OPENAI_API_KEY from the .env file`
-load_dotenv()
+        # Add an initial AI message to the memory
+        self.add_init_message_to_memory()
 
-# Access the API key from environment variables
-api_key = os.environ.get("OPENAI_API_KEY")
+    def initialize_llm(self):
+        """Initializes the language model with the provided API key."""
+        return ChatOpenAI(api_key=self.api_key, model="gpt-4o-mini")
 
-def main():
-    llm = ChatOpenAI(api_key=api_key, model="gpt-4o-mini")
+    def create_prompt_template(self):
+        """Creates the prompt template used by the chatbot."""
+        sys_context = """
+        You are Ducki, a programming assistant designed to help developers think through problems and come up with their own solutions. 
+        Your role is to ask insightful, guiding questions and provide minimal hints or short code snippets when necessary. 
+        Your goal is not to provide full solutions but to encourage problem-solving and deeper understanding. 
+        Be concise, thoughtful, and encourage the developer to reflect on their approach. 
+        You're the smarter alternative to rubber duck debugging.
+        """
+        return ChatPromptTemplate.from_messages([
+            SystemMessage(content=sys_context),
+            MessagesPlaceholder(variable_name="chat_history"),
+            HumanMessagePromptTemplate.from_template("{input}"),
+        ])
 
-    sys_context = """
-    You are Ducki, a programming assistant designed to help developers think through problems and come up with their own solutions. 
-    Your role is to ask insightful, guiding questions and provide minimal hints or short code snippets when necessary. 
-    Your goal is not to provide full solutions but to encourage problem-solving and deeper understanding. 
-    Be concise, thoughtful, and encourage the developer to reflect on their approach. 
-    You're the smarter alternative to rubber duck debugging.
-    """
+    def initialize_memory(self):
+        """Initializes conversation memory for chat history."""
+        return ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            SystemMessage(
-                content=sys_context
-            ),  # The persistent system prompt
-            MessagesPlaceholder(
-                variable_name="chat_history"
-            ),  # Where the memory will be stored.
-            HumanMessagePromptTemplate.from_template(
-                "{input}"
-            ),  # Where the human input will injected
-        ]
-    )
+    def create_chain(self):
+        """Creates an LLM chain that integrates the model, prompt, and memory."""
+        return LLMChain(
+            llm=self.llm,
+            prompt=self.prompt,
+            verbose=False,
+            memory=self.memory,
+        )
 
-    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-    # Create an LLM chain with the prompt and model
-    chain = LLMChain(
-        llm=llm,
-        prompt=prompt,
-        verbose=False,
-        memory=memory,
-    )
+    def send_init_message(self):
+        """Returns the initial message for the chatbot."""
+        return "Hello, world! I am Ducki, your rubber-duck programming companion. How may I help?"
 
-    while True:
-        # get the current input
-        user_input = input("You: ")
-        result = chain.invoke({"input": user_input})
+    def add_init_message_to_memory(self):
+        """Adds the initial message to memory for continuity in conversations."""
+        init_message = self.send_init_message()
+        self.memory.chat_memory.add_ai_message(init_message)
 
-        print(f"user: {user_input}")
-        print(f"Ducki: {result['text']}")
+    def generate_response(self, user_input: str):
+        """Generates a response based on the user's input."""
+        response = self.chain.invoke({"input": user_input})
+        return response['text']
+
 
 if __name__ == '__main__':
-    main()
+    # Get the `OPENAI_API_KEY` from the .env file
+    load_dotenv()
+    api_key = os.getenv("OPENAI_API_KEY")
+
+    ducki = Chatbot(api_key=api_key)
+    
+    # Example loop for interaction
+    while True:
+        user_input = input("You: ")
+        response = ducki.generate_response(user_input)
+
+        print(f"user: {user_input}")
+        print(f"Ducki: {response}")
