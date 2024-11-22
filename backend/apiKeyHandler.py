@@ -39,7 +39,5 @@ def main():
     apiHandler = apiKeyHandler()
     
 
-    
-
 if __name__ == '__main__':
     main()
