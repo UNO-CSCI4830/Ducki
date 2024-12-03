@@ -41,8 +41,6 @@ class Settings {
   }
 }
 
-
-
 // Custom hook to manage the chatbot state and logic
 function useChatbot() {
   const [message, setMessage] = useState("");
@@ -75,11 +73,6 @@ function useChatbot() {
     } finally {
       clearMessageBox();
     }
-  };
-
-  // function to clear Message box upon sending message to Ducki
-  const clearMessageBox = () => {
-    setMessage("");
   };
 
   const sendAPIKey = async (e) => {
@@ -136,8 +129,6 @@ const Chatbot = () => {
     sendAPIKey,
   } = useChatbot();
 
-  
-
   return (
     <div className="container" style={{ backgroundColor: bgColor }}>
       <button className="settings-button" onClick={() => settings.toggleSettings(setShowSettings)}>
@@ -167,22 +158,15 @@ const Chatbot = () => {
       </div>
 
       <div className="bottom-div">
-      <form align="center" onSubmit={sendMessage}>
-        <div className="input-container">
-          <textarea
+        <form align="center" onSubmit={sendMessage}>
+          <input
+            type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && e.shiftKey) {
-                e.preventDefault();
-                setMessage((prev) => prev + "\n");
-              }
-            }}
-      placeholder="Type a message to Ducki"
-    />
-    <button type="submit">Send</button>
-  </div>
-</form>
+            placeholder="Type a message to Ducki"
+          />
+          <button type="submit">Send</button>
+        </form>
       </div>
 
       {showSettings && (

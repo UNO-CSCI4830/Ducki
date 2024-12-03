@@ -122,38 +122,3 @@ h1 {
   transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition */
 }
 
-.input-container {
-  display: flex;
-  align-items: center; /* Vertically align items */
-  gap: 10px; /* Space between the textarea and button */
-}
-
-textarea {
-  width: 66vw;
-  height: 5.5vh; /* Explicit height */
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  resize: none;
-  background-color: #fee88f;
-  box-sizing: border-box; /* Include padding in height calculation */
-  line-height: 1.2; /* Match the line height of the button */
-}
-
-.input-container button {
-  height: 3.4vh; /* Adjust slightly to match the visual height of the textarea */
-  padding: 0 15px; /* Adjust side padding */
-  font-size: 16px;
-  background-color: #ffcc00;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center; /* Center text vertically inside the button */
-  justify-content: center; /* Center text horizontally inside the button */
-}
-
-.input-container button:hover {
-  background-color: #ffaa00; /* Slightly darker color on hover */
-}
