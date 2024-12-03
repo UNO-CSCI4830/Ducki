@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
-import './App.css'
-import Ducki from './assets/ducki.ico'
-
-
+import ReactMarkdown from "react-markdown";
+import "./App.css";
+import Ducki from "./assets/ducki.ico";
 
 // Helper class for managing settings (background color and visibility)
 class Settings {
@@ -48,33 +47,39 @@ class Settings {
 function useChatbot() {
   const [message, setMessage] = useState("");
   const [recentResponse, setRecentResponse] = useState(null);
-  const [showSettings, setShowSettings] = useState(false);
-  const [bgColor, setBgColor] = useState("#33363b");
   const [apiKey, setApiKey] = useState("");
+  const [bgColor, setBgColor] = useState("#33363b");
+  const [showSettings, setShowSettings] = useState(false);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
 
+  const settings = new Settings(); // Initialize settings object
+
   const sendMessage = async (e) => {
-    e.preventDefault(); 
-    if (message.trim() === "") return; // Do nothing if the message is empty
+    e.preventDefault();
+    if (message.trim() === "") return;
+
+    setRecentResponse({
+      user: message,
+      bot: "",
+    });
 
     try {
-      const response = await axios.post("/api/message", {
-        text: message,
-      });
-
-      // Update the 'recentResponse' state with the new user message and bot's response
+      const response = await axios.post("/api/message", { text: message });
       setRecentResponse({
-        user: message, // User message
-        bot: response.data.response, // Ducki's response
+        user: message,
+        bot: response.data.response,
       });
-
-      // Clear the input field after the message is sent
       setMessage("");
     } catch (error) {
       console.error("Error communicating with backend", error);
     } finally {
       clearMessageBox();
     }
+  };
+
+  // function to clear Message box upon sending message to Ducki
+  const clearMessageBox = () => {
+    setMessage("");
   };
 
   const sendAPIKey = async (e) => {
@@ -88,48 +93,58 @@ function useChatbot() {
     try {
       const response = await axios.post("/api/api_key", { api_key: apiKey });
       console.log("API key sent successfully:", response.data.message);
-      setShowApiKeyModal(false);
+      settings.closeApiKeyModal(setShowApiKeyModal);
       setApiKey(""); // Clear the API key input field after submission
     } catch (error) {
       console.error("Error sending API key to backend", error);
     }
   };
 
-  const toggleSettings = () => {
-    setShowSettings(!showSettings);
+  return {
+    message,
+    setMessage,
+    recentResponse,
+    settings,
+    apiKey,
+    setApiKey,
+    bgColor,
+    setBgColor,
+    showSettings,
+    setShowSettings,
+    showApiKeyModal,
+    setShowApiKeyModal,
+    sendMessage,
+    sendAPIKey,
   };
+}
 
-  const closeSettings = () => {
-    setShowSettings(false);
-  };
+const Chatbot = () => {
+  const {
+    message,
+    setMessage,
+    recentResponse,
+    settings,
+    apiKey,
+    setApiKey,
+    bgColor,
+    setBgColor,
+    showSettings,
+    setShowSettings,
+    showApiKeyModal,
+    setShowApiKeyModal,
+    sendMessage,
+    sendAPIKey,
+  } = useChatbot();
 
-  const openApiKeyModal = () => {
-    setShowApiKeyModal(true);
-  };
-
-  const closeApiKeyModal = () => {
-    setShowApiKeyModal(false);
-    setApiKey(""); // Clear API key input on cancel
-  };
-
-  const handleApiKeyChange = (e) => {
-    setApiKey(e.target.value);
-  };
-
-  const toggleBackgroundColor = () => {
-    setBgColor((prevColor) => (prevColor === "white" ? "#33363b" : "white"));
-  };
+  
 
   return (
     <div className="container" style={{ backgroundColor: bgColor }}>
-      <button className="settings-button" onClick={toggleSettings}>
+      <button className="settings-button" onClick={() => settings.toggleSettings(setShowSettings)}>
         ⚙️ Settings
       </button>
 
-      <h1
-        align="center"
-        style={{ color: bgColor === "white" ? "black" : "white" }}
-      >
+      <h1 align="center" style={{ color: bgColor === "white" ? "black" : "white" }}>
         Ducki Chatbot
       </h1>
 
@@ -144,22 +159,30 @@ function useChatbot() {
               <strong>You:</strong> {recentResponse.user}
             </p>
             <p>
-              <strong>Ducki:</strong> {recentResponse.bot}
+              <strong>Ducki:</strong>
+              <ReactMarkdown>{recentResponse.bot}</ReactMarkdown>
             </p>
           </div>
         )}
       </div>
 
       <div className="bottom-div">
-        <form align="center" onSubmit={sendMessage}>
-          <input
-            type="text"
+      <form align="center" onSubmit={sendMessage}>
+        <div className="input-container">
+          <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Type a message to Ducki"
-          />
-          <button type="submit">Send</button>
-        </form>
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && e.shiftKey) {
+                e.preventDefault();
+                setMessage((prev) => prev + "\n");
+              }
+            }}
+      placeholder="Type a message to Ducki"
+    />
+    <button type="submit">Send</button>
+  </div>
+</form>
       </div>
 
       {showSettings && (
@@ -168,14 +191,18 @@ function useChatbot() {
           <p>Adjust your settings here.</p>
           <div>
             <label>Select Background Color:</label>
-            <button onClick={toggleBackgroundColor}>
+            <button onClick={() => settings.toggleBackgroundColor(setBgColor)}>
               Toggle to {bgColor === "white" ? "#33363b" : "White"}
             </button>
           </div>
           <div>
-            <button onClick={openApiKeyModal}>Input API Key</button>
+            <button onClick={() => settings.openApiKeyModal(setShowApiKeyModal)}>
+              Input API Key
+            </button>
           </div>
-          <button onClick={closeSettings}>Cancel</button>
+          <button onClick={() => settings.reset(setShowSettings, setShowApiKeyModal)}>
+            Cancel
+          </button>
         </div>
       )}
 
@@ -186,11 +213,11 @@ function useChatbot() {
             <input
               type="text"
               value={apiKey}
-              onChange={handleApiKeyChange}
+              onChange={(e) => setApiKey(e.target.value)}
               placeholder="Enter your API key"
             />
             <button type="submit">Save API Key</button>
-            <button type="button" onClick={closeApiKeyModal}>
+            <button type="button" onClick={() => settings.closeApiKeyModal(setShowApiKeyModal)}>
               Cancel
             </button>
           </form>
