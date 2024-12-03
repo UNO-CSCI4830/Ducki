@@ -27,7 +27,7 @@
   position: absolute;
   height: auto;
   width: 10%;
-  bottom: 15%;
+  bottom: 17.5%;
   left: 20%;
 }
 
@@ -38,8 +38,11 @@ h1 {
 }
 
 .bottom-div {
+  display: flex;
+  align-items: auto;
   margin-top: auto;
   padding-bottom: 5%;
+  gap: 10px;
 }
 
 .App-header {
@@ -57,13 +60,6 @@ h1 {
   color: #61dafb;
 }
 
-input[type=text] {
-  background-color: #fee88f;
-  width: 66vw;
-  height: 3vh;
-  text-align: center;
-}
-
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -72,3 +68,58 @@ input[type=text] {
     transform: rotate(360deg);
   }
 }
+
+/* Settings Button */
+.settings-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #b34374;
+  color: white;
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.settings-button:hover {
+  background-color: #45a049;
+}
+
+/* Modal (popup) styling */
+.settings-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.settings-modal h2 {
+  margin-top: 0;
+}
+
+.settings-modal button {
+  background-color: #f44336; /* Red color */
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 14px; /* Adjust as needed */
+}
+
+/* Hover Effect: Change the color when mouse is over the button */
+.settings-modal button:hover {
+  background-color: #e53935; /* Darker red color on hover */
+  transform: scale(1.05);  /* Slightly enlarge the button on hover */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition */
+}
+
+
