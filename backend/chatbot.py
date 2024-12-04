@@ -20,8 +20,9 @@ the form each time they open the app. There SHOULD be an option to retake the sc
 """
 
 class Chatbot:
-    def __init__(self, api_key: str):
+    def __init__(self, api_key: str, model="gpt-4o-mini"):
         self.api_key = api_key
+        self.model = model
         self.llm = self.initialize_llm()
         self.prompt = self.create_prompt_template()
         self.memory = self.initialize_memory()
@@ -32,7 +33,7 @@ class Chatbot:
 
     def initialize_llm(self):
         """Initializes the language model with the provided API key."""
-        return ChatOpenAI(api_key=self.api_key, model="gpt-4o-mini")
+        return ChatOpenAI(api_key=self.api_key, model=self.model)
 
     def create_prompt_template(self):
         """Creates the prompt template used by the chatbot."""
@@ -61,6 +62,10 @@ class Chatbot:
             verbose=False,
             memory=self.memory,
         )
+    
+    def set_model(self, model):
+        """For changing the model while app is running"""
+        self.model = model
 
     def send_init_message(self):
         """Returns the initial message for the chatbot."""
