@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
-import ReactMarkdown from "react-markdown";
 import "./App.css";
 import Ducki from "./assets/ducki.ico";
 import ImageComponent from "./components/ImageComponent";
+import { showAlert } from "./components/alert"
 
 // Helper class for managing settings (background color and visibility)
 class Settings {
@@ -15,8 +15,13 @@ class Settings {
 
   // Methods to toggle settings and background color
   toggleBackgroundColor(setBgColor) {
-    this.bgColor = this.bgColor === "white" ? "#33363b" : "white";
-    setBgColor(this.bgColor); // Update the state externally
+
+    // Old Implementation
+      // this.bgColor = this.bgColor === "#FFFFFF" ? "#33363b" : "#FFFFFF";
+      // setBgColor(this.bgColor); // Update the state externally
+
+    //New implementation
+    setBgColor((prevColor) => (prevColor === "#FFFFFF" ? "#33363b" : "#FFFFFF"));
   }
 
   toggleSettings(setShowSettings) {
@@ -42,26 +47,28 @@ class Settings {
   }
 }
 
+
 // Custom hook to manage the chatbot state and logic
 function useChatbot() {
+  
   const [message, setMessage] = useState("");
   const [recentResponse, setRecentResponse] = useState(null);
   const [apiKey, setApiKey] = useState("");
   const [bgColor, setBgColor] = useState("#33363b");
   const [showSettings, setShowSettings] = useState(false);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
-
+  
   const settings = new Settings(); // Initialize settings object
-
+  
   const sendMessage = async (e) => {
     e.preventDefault();
     if (message.trim() === "") return;
-
+    
     setRecentResponse({
       user: message,
       bot: "",
     });
-
+    
     try {
       const response = await axios.post("/api/message", { text: message });
       setRecentResponse({
@@ -83,19 +90,19 @@ function useChatbot() {
 
   const sendAPIKey = async (e) => {
     e.preventDefault();
-
+    
     if (apiKey.trim() === "") {
       console.error("API key is required");
       return;
     }
 
     try {
-      const response = await axios.post("/api/api_key", { api_key: apiKey });
-      console.log("API key sent successfully:", response.data.message);
       settings.closeApiKeyModal(setShowApiKeyModal);
       setApiKey(""); // Clear the API key input field after submission
+      showAlert("API Key Successfully Submitted!")
     } catch (error) {
-      console.error("Error sending API key to backend", error);
+      showAlert("Error sending API key to backend")
+      
     }
   };
 
@@ -136,7 +143,7 @@ const Chatbot = () => {
   } = useChatbot();
 
   return (
-    <div className="container" style={{ backgroundColor: bgColor }}>
+    <div className="container" style={{ backgroundColor: bgColor }} data-testid="chatbot-container">
       <button className="settings-button" onClick={() => settings.toggleSettings(setShowSettings)}>
         ⚙️ Settings
       </button>
@@ -157,7 +164,7 @@ const Chatbot = () => {
             </p>
             <p>
               <strong>Ducki:</strong>
-              <ReactMarkdown>{recentResponse.bot}</ReactMarkdown>
+              <p>{recentResponse.bot}</p>
             </p>
           </div>
         )}
@@ -189,7 +196,7 @@ const Chatbot = () => {
           <div>
             <label>Select Background Color:</label>
             <button onClick={() => settings.toggleBackgroundColor(setBgColor)}>
-              Toggle to {bgColor === "white" ? "#33363b" : "White"}
+              Toggle to {bgColor === "#FFFFFF" ? "#33363b" : "#FFFFFF"}
             </button>
           </div>
           <div>
