@@ -37,5 +37,10 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://backend:5000"
+  "proxy": "http://backend:5000",
+  "jest": {
+    "moduleNameMapper": {
+      "^axios$": "axios/dist/node/axios.cjs"
+    }
+  }
 }
