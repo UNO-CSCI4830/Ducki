@@ -10,7 +10,16 @@ const Chatbot = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [bgColor, setBgColor] = useState("#33363b");
   const [apiKey, setApiKey] = useState("");
+  const [model, setModel] = useState("")
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+
+  const models = [
+    "gpt-4o-mini",
+    "gpt-4",
+    "gpt-4-turbo",
+    "gpt-4o",
+    "gpt-3.5-turbo"
+  ]
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -61,6 +70,19 @@ const Chatbot = () => {
 
   const openApiKeyModal = () => {
     setShowApiKeyModal(true);
+  };
+
+  const toggleModel = async () => {
+    const nextModelIndex = (models.indexOf(model) + 1) % models.length;
+    const newModel = models[nextModelIndex];
+    setModel(newModel);
+  
+    try {
+      const response = await axios.post("/api/set_model", { model: newModel });
+      console.log("Model changed successfully:", response.data.message);
+    } catch (error) {
+      console.error("Error changing model:", error);
+    }
   };
 
   const closeApiKeyModal = () => {
@@ -132,7 +154,12 @@ const Chatbot = () => {
           <div>
             <button onClick={openApiKeyModal}>Input API Key</button>
           </div>
-          <button onClick={closeSettings}>Cancel</button>
+          <br/>
+          <div>
+            Toggle Chat Model<br/>
+            <button onClick={toggleModel}>Current Model: {model}</button>
+          </div>
+          <button onClick={closeSettings}>Close</button>
         </div>
       )}
 
@@ -148,7 +175,7 @@ const Chatbot = () => {
             />
             <button type="submit">Save API Key</button>
             <button type="button" onClick={closeApiKeyModal}>
-              Cancel
+              Close
             </button>
           </form>
         </div>
