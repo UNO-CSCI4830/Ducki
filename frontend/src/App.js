@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import "./App.css";
 import Ducki from "./assets/ducki.ico";
 
+
 // Helper class for managing settings (background color and visibility)
 class Settings {
   constructor() {
@@ -166,27 +167,48 @@ const Chatbot = () => {
           <button type="submit">Send</button>
         </form>
       </div>
-
       {showSettings && (
-        <div className="settings-modal">
-          <h2>Settings</h2>
-          <p>Adjust your settings here.</p>
-          <div>
-            <label>Select Background Color:</label>
-            <button onClick={() => settings.toggleBackgroundColor(setBgColor)}>
-              Toggle to {bgColor === "white" ? "#33363b" : "White"}
-            </button>
-          </div>
-          <div>
-            <button onClick={() => settings.openApiKeyModal(setShowApiKeyModal)}>
-              Input API Key
-            </button>
-          </div>
-          <button onClick={() => settings.reset(setShowSettings, setShowApiKeyModal)}>
-            Cancel
-          </button>
-        </div>
-      )}
+  <div className="settings-modal">
+    {/* Ducki Image */}
+    <img src={Ducki} alt="Ducki icon" className="settings-ducki-image" />
+   
+    <h2>Settings</h2>
+    <div className="settings-black-bar">
+    </div>
+    <div>
+      <label>Select Background Color</label>
+      <div className="background-toggle-buttons">
+        <button
+          onClick={() => setBgColor("#33363b")}
+          className="black-button"
+        >
+          Black
+        </button>
+        <button
+          onClick={() => setBgColor("#FFFDD0")}
+          className="white-button"
+        >
+          White
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <button onClick={() => settings.openApiKeyModal(setShowApiKeyModal)}>
+        Input API Key
+      </button>
+    </div>
+
+    <button onClick={() => settings.reset(setShowSettings, setShowApiKeyModal)}>
+      Cancel
+    </button>
+  </div>
+)}
+
+
+
+
+
 
       {showApiKeyModal && (
         <div className="settings-modal">
