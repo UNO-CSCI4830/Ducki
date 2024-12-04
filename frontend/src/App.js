@@ -3,6 +3,7 @@ import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import "./App.css";
 import Ducki from "./assets/ducki.ico";
+import ImageComponent from "./components/ImageComponent";
 
 // Helper class for managing settings (background color and visibility)
 class Settings {
@@ -14,12 +15,12 @@ class Settings {
 
   // Methods to toggle settings and background color
   toggleBackgroundColor(setBgColor) {
-    this.bgColor = this.bgColor === "white" ? "#33363b" : "white"; 
+    this.bgColor = this.bgColor === "white" ? "#33363b" : "white";
     setBgColor(this.bgColor); // Update the state externally
   }
 
   toggleSettings(setShowSettings) {
-    this.showSettings = !this.showSettings; 
+    this.showSettings = !this.showSettings;
     setShowSettings(this.showSettings); // Update the state externally
   }
 
@@ -145,7 +146,7 @@ const Chatbot = () => {
       </h1>
 
       <div className="DuckiImage">
-        <img src={Ducki} alt="Ducki icon" />
+        <ImageComponent src={Ducki} alt="Ducki" />
       </div>
 
       <div>
