@@ -4,13 +4,54 @@ import ReactMarkdown from "react-markdown";
 import "./App.css";
 import Ducki from "./assets/ducki.ico";
 
-const Chatbot = () => {
+
+// Helper class for managing settings (background color and visibility)
+class Settings {
+  constructor() {
+    this.bgColor = "#33363b"; // Initial background color (dark mode)
+    this.showSettings = false;
+    this.showApiKeyModal = false;
+  }
+
+  // Methods to toggle settings and background color
+  toggleBackgroundColor(setBgColor) {
+    this.bgColor = this.bgColor === "white" ? "#33363b" : "white"; 
+    setBgColor(this.bgColor); // Update the state externally
+  }
+
+  toggleSettings(setShowSettings) {
+    this.showSettings = !this.showSettings; 
+    setShowSettings(this.showSettings); // Update the state externally
+  }
+
+  openApiKeyModal(setShowApiKeyModal) {
+    this.showApiKeyModal = true;
+    setShowApiKeyModal(this.showApiKeyModal); // Update the state externally
+  }
+
+  closeApiKeyModal(setShowApiKeyModal) {
+    this.showApiKeyModal = false;
+    setShowApiKeyModal(this.showApiKeyModal); // Update the state externally
+  }
+
+  reset(setShowSettings, setShowApiKeyModal) {
+    this.showSettings = false;
+    this.showApiKeyModal = false;
+    setShowSettings(false);
+    setShowApiKeyModal(false); // Reset both states
+  }
+}
+
+// Custom hook to manage the chatbot state and logic
+function useChatbot() {
   const [message, setMessage] = useState("");
   const [recentResponse, setRecentResponse] = useState(null);
-  const [showSettings, setShowSettings] = useState(false);
-  const [bgColor, setBgColor] = useState("#33363b");
   const [apiKey, setApiKey] = useState("");
+  const [bgColor, setBgColor] = useState("#33363b");
+  const [showSettings, setShowSettings] = useState(false);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+
+  const settings = new Settings(); // Initialize settings object
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -44,48 +85,56 @@ const Chatbot = () => {
     try {
       const response = await axios.post("/api/api_key", { api_key: apiKey });
       console.log("API key sent successfully:", response.data.message);
-      setShowApiKeyModal(false);
+      settings.closeApiKeyModal(setShowApiKeyModal);
       setApiKey(""); // Clear the API key input field after submission
     } catch (error) {
       console.error("Error sending API key to backend", error);
     }
   };
 
-  const toggleSettings = () => {
-    setShowSettings(!showSettings);
+  return {
+    message,
+    setMessage,
+    recentResponse,
+    settings,
+    apiKey,
+    setApiKey,
+    bgColor,
+    setBgColor,
+    showSettings,
+    setShowSettings,
+    showApiKeyModal,
+    setShowApiKeyModal,
+    sendMessage,
+    sendAPIKey,
   };
+}
 
-  const closeSettings = () => {
-    setShowSettings(false);
-  };
-
-  const openApiKeyModal = () => {
-    setShowApiKeyModal(true);
-  };
-
-  const closeApiKeyModal = () => {
-    setShowApiKeyModal(false);
-    setApiKey(""); // Clear API key input on cancel
-  };
-
-  const handleApiKeyChange = (e) => {
-    setApiKey(e.target.value);
-  };
-
-  const toggleBackgroundColor = () => {
-    setBgColor((prevColor) => (prevColor === "white" ? "#33363b" : "white"));
-  };
+const Chatbot = () => {
+  const {
+    message,
+    setMessage,
+    recentResponse,
+    settings,
+    apiKey,
+    setApiKey,
+    bgColor,
+    setBgColor,
+    showSettings,
+    setShowSettings,
+    showApiKeyModal,
+    setShowApiKeyModal,
+    sendMessage,
+    sendAPIKey,
+  } = useChatbot();
 
   return (
     <div className="container" style={{ backgroundColor: bgColor }}>
-      <button className="settings-button" onClick={toggleSettings}>
+      <button className="settings-button" onClick={() => settings.toggleSettings(setShowSettings)}>
         ⚙️ Settings
       </button>
 
-      <h1
-        align="center"
-        style={{ color: bgColor === "white" ? "black" : "white" }}
-      >
+      <h1 align="center" style={{ color: bgColor === "white" ? "black" : "white" }}>
         Ducki Chatbot
       </h1>
 
@@ -118,23 +167,48 @@ const Chatbot = () => {
           <button type="submit">Send</button>
         </form>
       </div>
-
       {showSettings && (
-        <div className="settings-modal">
-          <h2>Settings</h2>
-          <p>Adjust your settings here.</p>
-          <div>
-            <label>Select Background Color:</label>
-            <button onClick={toggleBackgroundColor}>
-              Toggle to {bgColor === "white" ? "#33363b" : "White"}
-            </button>
-          </div>
-          <div>
-            <button onClick={openApiKeyModal}>Input API Key</button>
-          </div>
-          <button onClick={closeSettings}>Cancel</button>
-        </div>
-      )}
+  <div className="settings-modal">
+    {/* Ducki Image */}
+    <img src={Ducki} alt="Ducki icon" className="settings-ducki-image" />
+   
+    <h2>Settings</h2>
+    <div className="settings-black-bar">
+    </div>
+    <div>
+      <label>Select Background Color</label>
+      <div className="background-toggle-buttons">
+        <button
+          onClick={() => setBgColor("#33363b")}
+          className="black-button"
+        >
+          Black
+        </button>
+        <button
+          onClick={() => setBgColor("#FFFDD0")}
+          className="white-button"
+        >
+          White
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <button onClick={() => settings.openApiKeyModal(setShowApiKeyModal)}>
+        Input API Key
+      </button>
+    </div>
+
+    <button onClick={() => settings.reset(setShowSettings, setShowApiKeyModal)}>
+      Cancel
+    </button>
+  </div>
+)}
+
+
+
+
+
 
       {showApiKeyModal && (
         <div className="settings-modal">
@@ -143,11 +217,11 @@ const Chatbot = () => {
             <input
               type="text"
               value={apiKey}
-              onChange={handleApiKeyChange}
+              onChange={(e) => setApiKey(e.target.value)}
               placeholder="Enter your API key"
             />
             <button type="submit">Save API Key</button>
-            <button type="button" onClick={closeApiKeyModal}>
+            <button type="button" onClick={() => settings.closeApiKeyModal(setShowApiKeyModal)}>
               Cancel
             </button>
           </form>
@@ -158,3 +232,4 @@ const Chatbot = () => {
 };
 
 export default Chatbot;
+
