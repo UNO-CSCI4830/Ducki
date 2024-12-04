@@ -31,6 +31,5 @@ describe("Chatbot Settings - Background Color Toggle", () => {
 
     // Verify the background color is back to dark mode
     await waitFor(() => expect(container).toHaveStyle({ backgroundColor: "rgb(51, 54, 59)" }));
-    console.log(container.backgroundColor)
   });
 });

@@ -3,7 +3,8 @@ import axios from "axios";
 import "./App.css";
 import Ducki from "./assets/ducki.ico";
 import ImageComponent from "./components/ImageComponent";
-import { showAlert } from "./components/alert"
+import Popup from "./components/popup"
+// import { showAlert } from "./components/alert"
 
 // Helper class for managing settings (background color and visibility)
 class Settings {
@@ -17,8 +18,8 @@ class Settings {
   toggleBackgroundColor(setBgColor) {
 
     // Old Implementation
-      // this.bgColor = this.bgColor === "#FFFFFF" ? "#33363b" : "#FFFFFF";
-      // setBgColor(this.bgColor); // Update the state externally
+    // this.bgColor = this.bgColor === "#FFFFFF" ? "#33363b" : "#FFFFFF";
+    // setBgColor(this.bgColor); // Update the state externally
 
     //New implementation
     setBgColor((prevColor) => (prevColor === "#FFFFFF" ? "#33363b" : "#FFFFFF"));
@@ -50,25 +51,27 @@ class Settings {
 
 // Custom hook to manage the chatbot state and logic
 function useChatbot() {
-  
+
+  // experimental popup
+  const [showPopup, setShowPopup] = useState(false);
   const [message, setMessage] = useState("");
   const [recentResponse, setRecentResponse] = useState(null);
   const [apiKey, setApiKey] = useState("");
   const [bgColor, setBgColor] = useState("#33363b");
   const [showSettings, setShowSettings] = useState(false);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
-  
+
   const settings = new Settings(); // Initialize settings object
-  
+
   const sendMessage = async (e) => {
     e.preventDefault();
     if (message.trim() === "") return;
-    
+
     setRecentResponse({
       user: message,
       bot: "",
     });
-    
+
     try {
       const response = await axios.post("/api/message", { text: message });
       setRecentResponse({
@@ -88,9 +91,28 @@ function useChatbot() {
     setMessage("");
   };
 
+  // OLD IMPLEMENTATION
+  // const sendAPIKey = async (e) => {
+  //   e.preventDefault();
+
+  //   if (apiKey.trim() === "") {
+  //     console.error("API key is required");
+  //     return;
+  //   }
+
+  //   try {
+  //     settings.closeApiKeyModal(setShowApiKeyModal);
+  //     setApiKey(""); // Clear the API key input field after submission
+  //     showAlert("API Key Successfully Submitted!")
+  //   } catch (error) {
+  //     showAlert("Error sending API key to backend")
+
+  //   }
+  // };
+
   const sendAPIKey = async (e) => {
     e.preventDefault();
-    
+
     if (apiKey.trim() === "") {
       console.error("API key is required");
       return;
@@ -99,12 +121,12 @@ function useChatbot() {
     try {
       settings.closeApiKeyModal(setShowApiKeyModal);
       setApiKey(""); // Clear the API key input field after submission
-      showAlert("API Key Successfully Submitted!")
+      setShowPopup(true); // Show the confirmation popup
     } catch (error) {
-      showAlert("Error sending API key to backend")
-      
+      console.error("Error sending API key to backend");
     }
   };
+
 
   return {
     message,
@@ -121,6 +143,8 @@ function useChatbot() {
     setShowApiKeyModal,
     sendMessage,
     sendAPIKey,
+    showPopup,
+    setShowPopup
   };
 }
 
@@ -140,6 +164,8 @@ const Chatbot = () => {
     setShowApiKeyModal,
     sendMessage,
     sendAPIKey,
+    showPopup,
+    setShowPopup
   } = useChatbot();
 
   return (
@@ -227,9 +253,14 @@ const Chatbot = () => {
           </form>
         </div>
       )}
+      {showPopup && (
+        <Popup
+          message="API Key Successfully Submitted!"
+          onClose={() => setShowPopup(false)} // Hide the popup on dismiss
+        />
+      )}
     </div>
   );
 };
 
 export default Chatbot;
-
