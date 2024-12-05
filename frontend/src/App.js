@@ -219,7 +219,7 @@ const Chatbot = () => {
         </div>
       )}
     </div>
-  );
+  ); 
 };
 
 export default Chatbot;
