@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import ReactMarkdown from "react-markdown";
+
 import "./App.css";
 import Ducki from "./assets/ducki.ico";
 
@@ -150,7 +150,7 @@ const Chatbot = () => {
             </p>
             <p>
               <strong>Ducki:</strong>
-              <ReactMarkdown>{recentResponse.bot}</ReactMarkdown>
+              <p>{recentResponse.bot}</p>
             </p>
           </div>
         )}
