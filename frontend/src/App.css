@@ -157,3 +157,34 @@ textarea {
 .input-container button:hover {
   background-color: #ffaa00; /* Slightly darker color on hover */
 }
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  height: 500px; 
+  width: 800px;
+  overflow-y: scroll;
+}
+
+.user-bubble {
+  max-width: 60%;
+  padding: 10px;
+  background-color: #4CAF50;  
+  color: white;
+  border-radius: 15px;
+  font-size: 16px;
+  line-height: 1.4;
+  align-self: flex-end;  
+}
+
+.bot-bubble {
+  max-width: 60%;
+  padding: 10px;
+  background-color: #f1f1f1;  
+  color: black;
+  border-radius: 15px;
+  font-size: 16px;
+  line-height: 1.4;
+  align-self: flex-start;
+}

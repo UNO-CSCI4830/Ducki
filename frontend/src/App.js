@@ -150,18 +150,17 @@ const Chatbot = () => {
 
       <div>
         {recentResponse && (
-          <div>
-            <p>
+          <div className="chat-container">
+            <div className="chat-bubble user-bubble">
               <strong>You:</strong> {recentResponse.user}
-            </p>
-            <p>
-              <strong>Ducki:</strong>
-              <ReactMarkdown>{recentResponse.bot}</ReactMarkdown>
-            </p>
+            </div>
+            <div className="chat-bubble bot-bubble">
+              <strong>Ducki:</strong> <ReactMarkdown>{recentResponse.bot}</ReactMarkdown>
+            </div>
           </div>
-        )}
+    )}
       </div>
-
+      
       <div className="bottom-div">
         <form align="center" onSubmit={sendMessage}>
           <div className="input-container">
