@@ -91,25 +91,6 @@ function useChatbot() {
     setMessage("");
   };
 
-  // OLD IMPLEMENTATION
-  // const sendAPIKey = async (e) => {
-  //   e.preventDefault();
-
-  //   if (apiKey.trim() === "") {
-  //     console.error("API key is required");
-  //     return;
-  //   }
-
-  //   try {
-  //     settings.closeApiKeyModal(setShowApiKeyModal);
-  //     setApiKey(""); // Clear the API key input field after submission
-  //     showAlert("API Key Successfully Submitted!")
-  //   } catch (error) {
-  //     showAlert("Error sending API key to backend")
-
-  //   }
-  // };
-
   const sendAPIKey = async (e) => {
     e.preventDefault();
 
@@ -173,8 +154,8 @@ const Chatbot = () => {
       <button className="settings-button" onClick={() => settings.toggleSettings(setShowSettings)}>
         ⚙️ Settings
       </button>
-
-      <h1 align="center" style={{ color: bgColor === "white" ? "black" : "white" }}>
+      
+      <h1 align="center" style={{ color: bgColor === "#FFFFFF" ? "black" : "#ffc438" }}>
         Ducki Chatbot
       </h1>
 

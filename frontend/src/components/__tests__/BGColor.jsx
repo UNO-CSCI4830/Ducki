@@ -7,20 +7,19 @@ describe("Chatbot Settings - Background Color Toggle", () => {
     // Render the Chatbot component
     render(<Chatbot />);
 
-    // Get the settings button and click to open the modal
+    // Click neccessary buttons
     const settingsButton = screen.getByRole("button", { name: /⚙️ Settings/i });
     fireEvent.click(settingsButton);
 
-    // Check that the settings modal is open and find the toggle color button
     var toggleColorButton = screen.getByRole("button", { name: /toggle to/i });
 
-    // Get the container using the test ID
+    // Get the container
     var container = screen.getByTestId("chatbot-container");
 
-    // Verify initial state (dark mode background)
+    // Verify initial color (dark mode background)
     expect(container).toHaveStyle({ backgroundColor: "rgb(51, 54, 59)" });
 
-    // Simulate clicking the toggle color button
+    // Clicking the toggle color button
     fireEvent.click(toggleColorButton);
 
     // Verify the background color is now white
