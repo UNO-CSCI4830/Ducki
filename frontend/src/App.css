@@ -119,7 +119,7 @@ h1 {
 .settings-modal button:hover {
   background-color: #e53935; /* Darker red color on hover */
   transform: scale(1.05);  /* Slightly enlarge the button on hover */
-  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition */
+  transition: background-color 0.3s ease, transform 0.2s ease; 
 }
 
 .input-container {
@@ -191,4 +191,32 @@ textarea {
 
 .popup-content button:hover {
   background-color: #0056b3;
+}
+
+/* Style for the HideDucki button */
+.HideDucki {
+  background-color: #ffd866; 
+  color: #33363b; 
+  border: none; 
+  padding: 10px 20px; 
+  font-size: 16px; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  transition: background-color 0.3s ease; 
+  margin-top: 0px;
+  display: flex; 
+  text-align: center;
+  position: fixed;
+  left: 20px;
+  top: 80px;
+}
+
+/* Add hover effect */
+.HideDucki:hover {
+  background-color: #ffc438;
+}
+
+/* Add focus effect for accessibility */
+.HideDucki:focus {
+  outline: 2px solid #33363b; 
 }

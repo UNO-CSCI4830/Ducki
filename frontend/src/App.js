@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "./App.css";
-import Ducki from "./assets/ducki.ico";
-import ImageComponent from "./components/ImageComponent";
+// import Ducki from "./assets/ducki.ico";
+// import ImageComponent from "./components/ImageComponent";
 import Popup from "./components/popup"
-// import { showAlert } from "./components/alert"
+import DuckiImageToggle from "./components/HideDucki";
 
 // Helper class for managing settings (background color and visibility)
 class Settings {
@@ -154,14 +154,17 @@ const Chatbot = () => {
       <button className="settings-button" onClick={() => settings.toggleSettings(setShowSettings)}>
         ⚙️ Settings
       </button>
-      
+
       <h1 align="center" style={{ color: bgColor === "#FFFFFF" ? "black" : "#ffc438" }}>
         Ducki Chatbot
       </h1>
 
-      <div className="DuckiImage">
+      {/* Old implementation */}
+      {/* <div className="DuckiImage">
         <ImageComponent src={Ducki} alt="Ducki" />
-      </div>
+      </div> */}
+
+      <DuckiImageToggle />
 
       <div>
         {recentResponse && (
@@ -215,6 +218,7 @@ const Chatbot = () => {
             Cancel
           </button>
         </div>
+
       )}
 
       {showApiKeyModal && (
