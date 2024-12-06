@@ -7,12 +7,7 @@ import DuckiNoise from "./assets/genericquack.mp3"
 
 
 
-const playDuckSound = () => {
-  const quackSound = new Audio(DuckiNoise); //DUCKI NOISE
-  quackSound.play().catch((error) => {
-    console.error('Audio playback error:', error);
-  });
-};
+
 
 // Helper class for managing settings (background color and visibility)
 class Settings {
@@ -64,7 +59,12 @@ function useChatbot() {
   const openExplanation = () => setShowExplanation(true);
   const closeExplanation = () => setShowExplanation(false);
   const [fontResponse, setFontResponse] = useState('16px'); // Default font size
-  
+  const playDuckSound = () => {
+    const quackSound = new Audio(DuckiNoise); //DUCKI NOISE
+    quackSound.play().catch((error) => {
+      console.error('Audio playback error:', error);
+    });
+  };
   const sendMessage = async (e) => {
     e.preventDefault();
     if (message.trim() === "") return;
@@ -129,7 +129,13 @@ function useChatbot() {
     setFontResponse, // This is correctly passed
   };
 }
-
+const playDuckSound = () => {
+  console.log('playDuckSound was called')
+  const quackSound = new Audio(DuckiNoise); //DUCKI NOISE
+    quackSound.play().catch((error) => {
+      console.error('Audio playback error:', error);
+    });
+  };
 const Chatbot = () => {
   const {
     message,
@@ -153,13 +159,17 @@ const Chatbot = () => {
     setFontResponse, // This is used correctly now
   } = useChatbot();
 
-  
+
  
   const [isSpinning, setIsSpinning] = useState(false);
   const handleDuckiClick = () => {
+    console.log('Ducki was clicked, spinning state:', isSpinning);
     setIsSpinning(true);
+    setTimeout(() => {
+      setIsSpinning(false);
+      console.log('Spin removed');
+    }, 1000);
     playDuckSound();
-    setTimeout(() => setIsSpinning(false), 1000); // Remove the spin class after 1 second
   };
 
   return (
@@ -212,8 +222,8 @@ const Chatbot = () => {
           <div className="duck-container">
             <img 
               src={Ducki} 
-              alt="Ducki icon" 
-              className={`settings-ducki-image ${isSpinning ? "spin" : ""}`} 
+              alt="Ducki icon settings" 
+              className={`settings-ducki-image ${isSpinning ? "spin" : ""}`}
               onClick={handleDuckiClick} 
             />
           </div>
