@@ -41,7 +41,33 @@ class Settings {
   }
 }
 
-// Custom hook to manage the chatbot state and logic
+class EditUserBubble {
+  openEditModal(setShowEditModal, setEditedText, currentText) {
+    setEditedText(currentText); // Pre-fill the text area
+    setShowEditModal(true);     // Show the modal
+  }
+
+  closeEditModal(setShowEditModal) {
+    setShowEditModal(false);
+  }
+
+  saveEditedMessage(setRecentResponse, editedText, setShowEditModal) {
+    setRecentResponse((prev) => ({
+      ...prev,
+      user: editedText,
+    }));
+    this.closeEditModal(setShowEditModal); // Close after saving
+  }
+
+  clearBothMessages(setRecentResponse, setShowEditModal) {
+    setRecentResponse({
+      user: "",
+      bot: "",
+    });
+    this.closeEditModal(setShowEditModal); // Close after clearing
+  }
+}
+
 function useChatbot() {
   const [message, setMessage] = useState("");
   const [recentResponse, setRecentResponse] = useState(null);
@@ -50,7 +76,12 @@ function useChatbot() {
   const [showSettings, setShowSettings] = useState(false);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
 
+  // For editing
+  const [editedText, setEditedText] = useState("");
+  const [showEditModal, setShowEditModal] = useState(false);
+
   const settings = new Settings(); // Initialize settings object
+  const editUserBubble = new EditUserBubble();
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -102,6 +133,7 @@ function useChatbot() {
     message,
     setMessage,
     recentResponse,
+    setRecentResponse,
     settings,
     apiKey,
     setApiKey,
@@ -113,6 +145,11 @@ function useChatbot() {
     setShowApiKeyModal,
     sendMessage,
     sendAPIKey,
+    editUserBubble,
+    editedText,
+    setEditedText,
+    showEditModal,
+    setShowEditModal,
   };
 }
 
@@ -121,6 +158,7 @@ const Chatbot = () => {
     message,
     setMessage,
     recentResponse,
+    setRecentResponse,
     settings,
     apiKey,
     setApiKey,
@@ -132,6 +170,11 @@ const Chatbot = () => {
     setShowApiKeyModal,
     sendMessage,
     sendAPIKey,
+    editUserBubble,
+    editedText,
+    setEditedText,
+    showEditModal,
+    setShowEditModal,
   } = useChatbot();
 
   return (
@@ -148,19 +191,25 @@ const Chatbot = () => {
         <img src={Ducki} alt="Ducki icon" />
       </div>
 
-      <div>
-        {recentResponse && (
-          <div className="chat-container">
-            <div className="chat-bubble user-bubble">
-              <strong>You:</strong> {recentResponse.user}
-            </div>
-            <div className="chat-bubble bot-bubble">
-              <strong>Ducki:</strong> <ReactMarkdown>{recentResponse.bot}</ReactMarkdown>
-            </div>
+      {recentResponse && (recentResponse.user || recentResponse.bot) && (
+        <div className="chat-container">
+          <div className="chat-bubble user-bubble">
+            <strong>You:</strong> {recentResponse.user}
           </div>
-    )}
-      </div>
-      
+          <button
+            className="edit-button-user"
+            onClick={() =>
+              editUserBubble.openEditModal(setShowEditModal, setEditedText, recentResponse.user)
+            }
+          >
+            Edit
+          </button>
+          <div className="chat-bubble bot-bubble">
+            <strong>Ducki:</strong> <ReactMarkdown>{recentResponse.bot}</ReactMarkdown>
+          </div>
+        </div>
+      )}
+
       <div className="bottom-div">
         <form align="center" onSubmit={sendMessage}>
           <div className="input-container">
@@ -179,6 +228,27 @@ const Chatbot = () => {
           </div>
         </form>
       </div>
+
+      {showEditModal && (
+        <div className="edit-modal">
+          <h2>Edit Your Message</h2>
+          <textarea
+            value={editedText}
+            onChange={(e) => setEditedText(e.target.value)}
+          />
+          <div>
+            <button onClick={() => editUserBubble.clearBothMessages(setRecentResponse, setShowEditModal)}>
+              Clear
+            </button>
+            <button onClick={() => editUserBubble.saveEditedMessage(setRecentResponse, editedText, setShowEditModal)}>
+              Send
+            </button>
+            <button onClick={() => editUserBubble.closeEditModal(setShowEditModal)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {showSettings && (
         <div className="settings-modal">
