@@ -3,6 +3,7 @@ import axios from "axios";
 import "./App.css";
 import Popup from "./components/popup"
 import DuckiImageToggle from "./components/HideDucki";
+import LinkModal from "./components/LinksModal";
 
 
 // Helper class for managing settings (background color and visibility)
@@ -60,6 +61,7 @@ function useChatbot() {
   const [showSettings, setShowSettings] = useState(false);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [fontSize, setFontSize] = useState(16); // New state for font size
+  const [showLinkModal, setShowLinkModal] = useState(false);
 
   const settings = new Settings(); // Initialize settings object
 
@@ -108,7 +110,6 @@ function useChatbot() {
     }
   };
 
-
   return {
     message,
     setMessage,
@@ -127,7 +128,9 @@ function useChatbot() {
     sendMessage,
     sendAPIKey,
     showPopup,
-    setShowPopup
+    setShowPopup,
+    showLinkModal,
+    setShowLinkModal
   };
 }
 
@@ -150,8 +153,16 @@ const Chatbot = () => {
     sendMessage,
     sendAPIKey,
     showPopup,
-    setShowPopup
+    setShowPopup,
+    showLinkModal,
+    setShowLinkModal
   } = useChatbot();
+
+  const externalLinks = [
+    { name: "GitHub", url: "https://github.com/UNO-CSCI4830/Ducki/" },
+    { name: "Stack Overflow", url: "https://stackoverflow.com" },
+    { name: "GeeksForGeeks", url: "https://www.geeksforgeeks.org" },
+  ];
 
   const toggleFontSize = () => {
     setFontSize((prevSize) => (prevSize === 16 ? 20 : 16)); // Toggle between 16px and 20px
@@ -162,6 +173,17 @@ const Chatbot = () => {
       <button className="settings-button" onClick={() => settings.toggleSettings(setShowSettings)}>
         ⚙️ Settings
       </button>
+
+      <button
+        onClick={() => setShowLinkModal(true)}
+        className="open-links-button"
+      >
+        Useful Links
+      </button>
+
+      {showLinkModal && (
+        <LinkModal links={externalLinks} onClose={() => setShowLinkModal(false)} />
+      )}
 
       <h1 align="center" style={{ color: bgColor === "#FFFFFF" ? "black" : "#ffc438" }}>
         Ducki Chatbot
