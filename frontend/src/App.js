@@ -64,7 +64,17 @@ function useChatbot() {
   const openExplanation = () => setShowExplanation(true);
   const closeExplanation = () => setShowExplanation(false);
   const [fontResponse, setFontResponse] = useState('16px'); // Default font size
-  
+  const [model, setModel] = useState("gpt-4o-mini")
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+
+  const models = [
+    "gpt-4o-mini",
+    "gpt-4",
+    "gpt-4-turbo",
+    "gpt-4o",
+    "gpt-3.5-turbo"
+  ]
+
   const sendMessage = async (e) => {
     e.preventDefault();
     if (message.trim() === "") return;
@@ -106,6 +116,23 @@ function useChatbot() {
     }
   };
 
+  const toggleModel = async () => {
+    const nextModelIndex = (models.indexOf(model) + 1) % models.length;
+    const newModel = models[nextModelIndex];
+    setModel(newModel);
+  
+  try {
+      const response = await axios.post("/api/set_model", { model: newModel });
+      console.log("Model changed successfully:", response.data.message);
+    } catch (error) {
+      console.error("Error changing model:", error);
+    }
+  };
+
+  const closeApiKeyModal = () => {
+    setShowApiKeyModal(false);
+    setApiKey(""); // Clear API key input on cancel
+
   return {
     message,
     setMessage,
@@ -127,6 +154,7 @@ function useChatbot() {
     closeExplanation,
     fontResponse,
     setFontResponse, // This is correctly passed
+
   };
 }
 
@@ -272,6 +300,14 @@ const Chatbot = () => {
             related to programming.
           </p>
           <button style={{ fontSize: fontResponse }} onClick={closeExplanation}>Close</button>
+
+          <br/>
+          <div>
+            Toggle Chat Model<br/>
+            <button onClick={toggleModel}>Current Model: {model}</button>
+          </div>
+          <button onClick={closeSettings}>Close</button>
+
         </div>
       )}
 
@@ -288,7 +324,8 @@ const Chatbot = () => {
             />
             <button type="submit" style={{ fontSize: fontResponse }}>Save API Key</button>
             <button type="button"style={{ fontSize: fontResponse }} onClick={() => settings.closeApiKeyModal(setShowApiKeyModal)}>
-              Cancel
+              Close
+
             </button>
           </form>
         </div>
