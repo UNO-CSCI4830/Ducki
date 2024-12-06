@@ -12,6 +12,7 @@ class Settings {
     this.showApiKeyModal = false;
   }
 
+  // Methods to toggle settings and background color
   toggleBackgroundColor(setBgColor) {
     this.bgColor = this.bgColor === "white" ? "#33363b" : "white"; 
     setBgColor(this.bgColor); // Update the state externally
@@ -40,55 +41,25 @@ class Settings {
   }
 }
 
-// Revised EditUserBubble class without internal state
-class EditUserBubble {
-  openEditModal(setShowEditModal, setEditedText, currentText) {
-    setEditedText(currentText); // Pre-fill the text area
-    setShowEditModal(true);     // Show the modal
-  }
-
-  closeEditModal(setShowEditModal) {
-    setShowEditModal(false);
-  }
-
-  saveEditedMessage(setRecentResponse, editedText, setShowEditModal) {
-    setRecentResponse((prev) => ({
-      ...prev,
-      user: editedText,
-    }));
-    this.closeEditModal(setShowEditModal); // Close after saving
-  }
-
-  clearBothMessages(setRecentResponse, setShowEditModal) {
-    setRecentResponse({
-      user: "",
-      bot: "",
-    });
-    this.closeEditModal(setShowEditModal); // Close after clearing
-  }
-}
-
+// Custom hook to manage the chatbot state and logic
 function useChatbot() {
   const [message, setMessage] = useState("");
-  const [recentResponse, setRecentResponse] = useState({ user: "", bot: "" }); 
+  const [recentResponse, setRecentResponse] = useState(null);
   const [apiKey, setApiKey] = useState("");
   const [bgColor, setBgColor] = useState("#33363b");
   const [showSettings, setShowSettings] = useState(false);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
 
-  // For editing
-  const [editedText, setEditedText] = useState("");
-  const [showEditModal, setShowEditModal] = useState(false);
-
   const settings = new Settings(); // Initialize settings object
-  const editUserBubble = new EditUserBubble();
 
   const sendMessage = async (e) => {
     e.preventDefault();
     if (message.trim() === "") return;
 
-    const userMsg = message;
-    setRecentResponse({ user: userMsg, bot: "" });
+    setRecentResponse({
+      user: message,
+      bot: "",
+    });
 
     try {
       const response = await axios.post("/api/message", { text: message });
@@ -99,11 +70,19 @@ function useChatbot() {
       setMessage("");
     } catch (error) {
       console.error("Error communicating with backend", error);
+    } finally {
+      clearMessageBox();
     }
+  };
+
+  // function to clear Message box upon sending message to Ducki
+  const clearMessageBox = () => {
+    setMessage("");
   };
 
   const sendAPIKey = async (e) => {
     e.preventDefault();
+
     if (apiKey.trim() === "") {
       console.error("API key is required");
       return;
@@ -123,7 +102,6 @@ function useChatbot() {
     message,
     setMessage,
     recentResponse,
-    setRecentResponse,
     settings,
     apiKey,
     setApiKey,
@@ -135,11 +113,6 @@ function useChatbot() {
     setShowApiKeyModal,
     sendMessage,
     sendAPIKey,
-    editUserBubble,
-    editedText,
-    setEditedText,
-    showEditModal,
-    setShowEditModal,
   };
 }
 
@@ -148,7 +121,6 @@ const Chatbot = () => {
     message,
     setMessage,
     recentResponse,
-    setRecentResponse,
     settings,
     apiKey,
     setApiKey,
@@ -160,11 +132,6 @@ const Chatbot = () => {
     setShowApiKeyModal,
     sendMessage,
     sendAPIKey,
-    editUserBubble,
-    editedText,
-    setEditedText,
-    showEditModal,
-    setShowEditModal,
   } = useChatbot();
 
   return (
@@ -181,25 +148,19 @@ const Chatbot = () => {
         <img src={Ducki} alt="Ducki icon" />
       </div>
 
-      {recentResponse && (recentResponse.user || recentResponse.bot) && (
-        <div className="chat-container">
-          <div className="chat-bubble user-bubble">
-            <strong>You:</strong> {recentResponse.user}
+      <div>
+        {recentResponse && (
+          <div className="chat-container">
+            <div className="chat-bubble user-bubble">
+              <strong>You:</strong> {recentResponse.user}
+            </div>
+            <div className="chat-bubble bot-bubble">
+              <strong>Ducki:</strong> <ReactMarkdown>{recentResponse.bot}</ReactMarkdown>
+            </div>
           </div>
-          <button
-            className="edit-button-user"
-            onClick={() =>
-              editUserBubble.openEditModal(setShowEditModal, setEditedText, recentResponse.user)
-            }
-          >
-            Edit
-          </button>
-          <div className="chat-bubble bot-bubble">
-            <strong>Ducki:</strong> <ReactMarkdown>{recentResponse.bot}</ReactMarkdown>
-          </div>
-        </div>
-      )}
-
+    )}
+      </div>
+      
       <div className="bottom-div">
         <form align="center" onSubmit={sendMessage}>
           <div className="input-container">
@@ -218,28 +179,6 @@ const Chatbot = () => {
           </div>
         </form>
       </div>
-
-      {/* Edit Modal */}
-      {showEditModal && (
-        <div className="edit-modal">
-          <h2>Edit Your Message</h2>
-          <textarea
-            value={editedText}
-            onChange={(e) => setEditedText(e.target.value)}
-          />
-          <div>
-            <button onClick={() => editUserBubble.clearBothMessages(setRecentResponse, setShowEditModal)}>
-              Clear
-            </button>
-            <button onClick={() => editUserBubble.saveEditedMessage(setRecentResponse, editedText, setShowEditModal)}>
-              Send
-            </button>
-            <button onClick={() => editUserBubble.closeEditModal(setShowEditModal)}>
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
 
       {showSettings && (
         <div className="settings-modal">
@@ -284,3 +223,4 @@ const Chatbot = () => {
 };
 
 export default Chatbot;
+
