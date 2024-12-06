@@ -6,7 +6,6 @@ import Ducki from "./assets/ducki.ico";
 import DuckiNoise from "./assets/genericquack.mp3"
 
 
-
 const playDuckSound = () => {
   const quackSound = new Audio(DuckiNoise); //DUCKI NOISE
   quackSound.play().catch((error) => {
@@ -60,37 +59,22 @@ function useChatbot() {
   const [showSettings, setShowSettings] = useState(false);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
-  const settings = new Settings(); // Initialize settings object
-  const openExplanation = () => setShowExplanation(true);
-  const closeExplanation = () => setShowExplanation(false);
-  const [fontResponse, setFontResponse] = useState('16px'); // Default font size
-  const [model, setModel] = useState("gpt-4o-mini")
-  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+  const [fontResponse, setFontResponse] = useState("16px");
+  const [model, setModel] = useState("gpt-4o-mini");
 
-  const models = [
-    "gpt-4o-mini",
-    "gpt-4",
-    "gpt-4-turbo",
-    "gpt-4o",
-    "gpt-3.5-turbo"
-  ]
+  const settings = new Settings();
+
+  const models = ["gpt-4o-mini", "gpt-4", "gpt-4-turbo", "gpt-4o", "gpt-3.5-turbo"];
 
   const sendMessage = async (e) => {
     e.preventDefault();
     if (message.trim() === "") return;
 
-    setRecentResponse({
-      user: message,
-      bot: "",
-    });
-    
+    setRecentResponse({ user: message, bot: "" });
+
     try {
       const response = await axios.post("/api/message", { text: message });
-      setRecentResponse({
-        user: message,
-        bot: response.data.response,
-      });
-      
+      setRecentResponse({ user: message, bot: response.data.response });
       playDuckSound();
       setMessage("");
     } catch (error) {
@@ -110,7 +94,7 @@ function useChatbot() {
       const response = await axios.post("/api/api_key", { api_key: apiKey });
       console.log("API key sent successfully:", response.data.message);
       settings.closeApiKeyModal(setShowApiKeyModal);
-      setApiKey(""); // Clear the API key input field after submission
+      setApiKey("");
     } catch (error) {
       console.error("Error sending API key to backend", error);
     }
@@ -120,8 +104,8 @@ function useChatbot() {
     const nextModelIndex = (models.indexOf(model) + 1) % models.length;
     const newModel = models[nextModelIndex];
     setModel(newModel);
-  
-  try {
+
+    try {
       const response = await axios.post("/api/set_model", { model: newModel });
       console.log("Model changed successfully:", response.data.message);
     } catch (error) {
@@ -131,7 +115,8 @@ function useChatbot() {
 
   const closeApiKeyModal = () => {
     setShowApiKeyModal(false);
-    setApiKey(""); // Clear API key input on cancel
+    setApiKey("");
+  };
 
   return {
     message,
@@ -150,11 +135,11 @@ function useChatbot() {
     sendAPIKey,
     showExplanation,
     setShowExplanation,
-    openExplanation,
-    closeExplanation,
     fontResponse,
-    setFontResponse, // This is correctly passed
-
+    setFontResponse,
+    toggleModel,
+    model,
+    closeApiKeyModal,
   };
 }
 
@@ -173,6 +158,8 @@ const Chatbot = () => {
     showApiKeyModal,
     setShowApiKeyModal,
     sendMessage,
+    toggleModel,
+    model,
     sendAPIKey,
     showExplanation, // Add this
     openExplanation, // Add this
@@ -285,6 +272,11 @@ const Chatbot = () => {
           <div>
             <button onClick={openExplanation} style={{ fontSize: fontResponse }} >What is this chatbot? </button>
           </div>
+          <br/>
+          <div>
+            Toggle Chat Model<br/>
+            <button style={{ fontSize: fontResponse }} onClick={toggleModel}>Current Model: {model}</button>
+          </div>
           <button onClick={() => settings.reset(setShowSettings, setShowApiKeyModal)} style={{ fontSize: fontResponse }}>
             Cancel
           </button>
@@ -300,14 +292,6 @@ const Chatbot = () => {
             related to programming.
           </p>
           <button style={{ fontSize: fontResponse }} onClick={closeExplanation}>Close</button>
-
-          <br/>
-          <div>
-            Toggle Chat Model<br/>
-            <button onClick={toggleModel}>Current Model: {model}</button>
-          </div>
-          <button onClick={closeSettings}>Close</button>
-
         </div>
       )}
 
@@ -325,7 +309,6 @@ const Chatbot = () => {
             <button type="submit" style={{ fontSize: fontResponse }}>Save API Key</button>
             <button type="button"style={{ fontSize: fontResponse }} onClick={() => settings.closeApiKeyModal(setShowApiKeyModal)}>
               Close
-
             </button>
           </form>
         </div>
