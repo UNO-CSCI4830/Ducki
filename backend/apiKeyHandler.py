@@ -1,9 +1,10 @@
 from langchain_openai import ChatOpenAI
 
 class apiKeyHandler:
-
-    def checkKey(self,key):
-
+    """"Class designed to handle reading, writing, and validating openai api keys"""
+    
+    def checkKey(self,  key : str):
+        """Method to determine whether or not api key is valid"""
         try:
             llm = ChatOpenAI(api_key=key, model="gpt-4o-mini")
             llm("Testing")
@@ -16,7 +17,7 @@ class apiKeyHandler:
             return False
 
     def readKey(self):
-
+        """Method designed to read key from dotenv file"""
         try:
             with open('.env',"r") as file:
                 contents = file.readlines()
@@ -27,8 +28,8 @@ class apiKeyHandler:
         except FileNotFoundError as e:
             return None
 
-    def writeKey(self,key):
-
+    def writeKey(self,  key : str):
+        """Method designed to write and store key in dotenv file"""
         with open('.env','w') as file:
             keyString = 'OPENAI_API_KEY=' + key
             file.write(keyString)
