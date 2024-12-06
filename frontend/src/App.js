@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "./App.css";
-// import Ducki from "./assets/ducki.ico";
-// import ImageComponent from "./components/ImageComponent";
 import Popup from "./components/popup"
 import DuckiImageToggle from "./components/HideDucki";
+
 
 // Helper class for managing settings (background color and visibility)
 class Settings {
@@ -60,6 +59,7 @@ function useChatbot() {
   const [bgColor, setBgColor] = useState("#33363b");
   const [showSettings, setShowSettings] = useState(false);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+  const [fontSize, setFontSize] = useState(16); // New state for font size
 
   const settings = new Settings(); // Initialize settings object
 
@@ -118,6 +118,8 @@ function useChatbot() {
     setApiKey,
     bgColor,
     setBgColor,
+    fontSize,
+    setFontSize,
     showSettings,
     setShowSettings,
     showApiKeyModal,
@@ -139,6 +141,8 @@ const Chatbot = () => {
     setApiKey,
     bgColor,
     setBgColor,
+    fontSize,
+    setFontSize,
     showSettings,
     setShowSettings,
     showApiKeyModal,
@@ -149,8 +153,12 @@ const Chatbot = () => {
     setShowPopup
   } = useChatbot();
 
+  const toggleFontSize = () => {
+    setFontSize((prevSize) => (prevSize === 16 ? 20 : 16)); // Toggle between 16px and 20px
+  };
+
   return (
-    <div className="container" style={{ backgroundColor: bgColor }} data-testid="chatbot-container">
+    <div className="container" style={{ backgroundColor: bgColor, fontSize: `${fontSize}px`, }} data-testid="chatbot-container">
       <button className="settings-button" onClick={() => settings.toggleSettings(setShowSettings)}>
         ⚙️ Settings
       </button>
@@ -163,6 +171,10 @@ const Chatbot = () => {
       {/* <div className="DuckiImage">
         <ImageComponent src={Ducki} alt="Ducki" />
       </div> */}
+
+      <button className="font-toggle-button" onClick={toggleFontSize}>
+        {fontSize === 16 ? "Increase Font Size" : "Reset Font Size"}
+      </button>
 
       <DuckiImageToggle />
 

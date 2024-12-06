@@ -220,3 +220,26 @@ textarea {
 .HideDucki:focus {
   outline: 2px solid #33363b; 
 }
+
+.font-toggle-button {
+  background-color: #ffd866; 
+  color: #33363b; 
+  border: none; 
+  padding: 10px 20px; 
+  font-size: 16px; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  transition: background-color 0.3s ease; 
+  margin-top: 0px;
+  display: flex; 
+  text-align: center;
+  position: fixed;
+  left: 20px;
+  top: 140px;
+  
+}
+
+.font-toggle-button:hover {
+  background-color: #ffc438;
+}
+
