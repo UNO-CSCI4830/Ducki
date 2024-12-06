@@ -10,7 +10,7 @@ const Chatbot = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [bgColor, setBgColor] = useState("#33363b");
   const [apiKey, setApiKey] = useState("");
-  const [model, setModel] = useState("")
+  const [model, setModel] = useState("gpt-4o-mini")
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
 
   const models = [
