@@ -119,7 +119,7 @@ h1 {
 .settings-modal button:hover {
   background-color: #e53935; /* Darker red color on hover */
   transform: scale(1.05);  /* Slightly enlarge the button on hover */
-  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition */
+  transition: background-color 0.3s ease, transform 0.2s ease; 
 }
 
 .input-container {
@@ -156,4 +156,155 @@ textarea {
 
 .input-container button:hover {
   background-color: #ffaa00; /* Slightly darker color on hover */
+}
+
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.popup-content button {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.popup-content button:hover {
+  background-color: #0056b3;
+}
+
+/* Style for the HideDucki button */
+.HideDucki {
+  background-color: #ffd866; 
+  color: #33363b; 
+  border: none; 
+  padding: 10px 20px; 
+  font-size: 16px; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  transition: background-color 0.3s ease; 
+  margin-top: 0px;
+  display: flex; 
+  text-align: center;
+  position: fixed;
+  left: 20px;
+  top: 80px;
+}
+
+/* Add hover effect */
+.HideDucki:hover {
+  background-color: #ffc438;
+}
+
+/* Add focus effect for accessibility */
+.HideDucki:focus {
+  outline: 2px solid #33363b; 
+}
+
+.font-toggle-button {
+  background-color: #ffd866; 
+  color: #33363b; 
+  border: none; 
+  padding: 10px 20px; 
+  font-size: 16px; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  transition: background-color 0.3s ease; 
+  margin-top: 0px;
+  display: flex; 
+  text-align: center;
+  position: fixed;
+  left: 20px;
+  top: 140px;
+}
+
+.font-toggle-button:hover {
+  background-color: #ffc438;
+}
+
+.link-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.link-modal-content {
+  background: #33363b;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.link-button {
+  margin: 10px 0;
+  padding: 10px 15px;
+  background-color: #ffd866;
+  color: #33363b;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.link-button:hover {
+  background-color: #ffc438;
+}
+
+.close-button {
+  margin-top: 20px;
+  padding: 10px 15px;
+  background-color: #d9534f;
+  color: #33363b;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  background-color: #c9302c;
+}
+
+.open-links-button {
+  background-color: #ffd866; 
+  color: #33363b; 
+  border: none; 
+  padding: 10px 20px; 
+  font-size: 16px; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  transition: background-color 0.3s ease; 
+  margin-top: 0px;
+  display: flex; 
+  text-align: center;
+  position: fixed;
+  right: 20px;
+  top: 140px;
 }
