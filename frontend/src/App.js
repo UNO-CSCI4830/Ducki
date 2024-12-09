@@ -1,10 +1,19 @@
 import React, { useState } from "react";
 import axios from "axios";
+import ReactMarkdown from "react-markdown";
 import "./App.css";
-import Popup from "./components/popup"
-import DuckiImageToggle from "./components/HideDucki";
+import Ducki from "./assets/ducki.ico";
+import DuckiNoise from "./assets/genericquack.mp3"
 import LinkModal from "./components/LinksModal";
+import Popup from "./components/popup"
 
+
+const playDuckSound = () => {
+  const quackSound = new Audio(DuckiNoise); //DUCKI NOISE
+  quackSound.play().catch((error) => {
+    console.error('Audio playback error:', error);
+  });
+};
 
 // Helper class for managing settings (background color and visibility)
 class Settings {
@@ -16,13 +25,8 @@ class Settings {
 
   // Methods to toggle settings and background color
   toggleBackgroundColor(setBgColor) {
-
-    // Old Implementation
-    // this.bgColor = this.bgColor === "#FFFFFF" ? "#33363b" : "#FFFFFF";
-    // setBgColor(this.bgColor); // Update the state externally
-
-    //New implementation
-    setBgColor((prevColor) => (prevColor === "#FFFFFF" ? "#33363b" : "#FFFFFF"));
+    this.bgColor = this.bgColor === "white" ? "#33363b" : "white";
+    setBgColor(this.bgColor); // Update the state externally
   }
 
   toggleSettings(setShowSettings) {
@@ -48,11 +52,8 @@ class Settings {
   }
 }
 
-
 // Custom hook to manage the chatbot state and logic
 function useChatbot() {
-
-  // experimental popup
   const [showPopup, setShowPopup] = useState(false);
   const [message, setMessage] = useState("");
   const [recentResponse, setRecentResponse] = useState(null);
@@ -60,26 +61,27 @@ function useChatbot() {
   const [bgColor, setBgColor] = useState("#33363b");
   const [showSettings, setShowSettings] = useState(false);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
-  const [fontSize, setFontSize] = useState(16); // New state for font size
+  const [showExplanation, setShowExplanation] = useState(false);
+  const [fontResponse, setFontResponse] = useState("16px");
+  const [model, setModel] = useState("gpt-4o-mini");
   const [showLinkModal, setShowLinkModal] = useState(false);
 
-  const settings = new Settings(); // Initialize settings object
+  const settings = new Settings();
+  const openExplanation = () => setShowExplanation(true);
+  const closeExplanation = () => setShowExplanation(false);
+
+  const models = ["gpt-4o-mini", "gpt-4", "gpt-4-turbo", "gpt-4o", "gpt-3.5-turbo"];
 
   const sendMessage = async (e) => {
     e.preventDefault();
     if (message.trim() === "") return;
 
-    setRecentResponse({
-      user: message,
-      bot: "",
-    });
+    setRecentResponse({ user: message, bot: "" });
 
     try {
       const response = await axios.post("/api/message", { text: message });
-      setRecentResponse({
-        user: message,
-        bot: response.data.response,
-      });
+      setRecentResponse({ user: message, bot: response.data.response });
+      playDuckSound();
       setMessage("");
     } catch (error) {
       console.error("Error communicating with backend", error);
@@ -102,12 +104,32 @@ function useChatbot() {
     }
 
     try {
+      const response = await axios.post("/api/api_key", { api_key: apiKey });
+      console.log("API key sent successfully:", response.data.message);
       settings.closeApiKeyModal(setShowApiKeyModal);
-      setApiKey(""); // Clear the API key input field after submission
+      setApiKey("");
       setShowPopup(true); // Show the confirmation popup
     } catch (error) {
-      console.error("Error sending API key to backend");
+      console.error("Error sending API key to backend", error);
     }
+  };
+
+  const toggleModel = async () => {
+    const nextModelIndex = (models.indexOf(model) + 1) % models.length;
+    const newModel = models[nextModelIndex];
+    setModel(newModel);
+
+    try {
+      const response = await axios.post("/api/set_model", { model: newModel });
+      console.log("Model changed successfully:", response.data.message);
+    } catch (error) {
+      console.error("Error changing model:", error);
+    }
+  };
+
+  const closeApiKeyModal = () => {
+    setShowApiKeyModal(false);
+    setApiKey("");
   };
 
   return {
@@ -119,14 +141,21 @@ function useChatbot() {
     setApiKey,
     bgColor,
     setBgColor,
-    fontSize,
-    setFontSize,
     showSettings,
     setShowSettings,
     showApiKeyModal,
     setShowApiKeyModal,
     sendMessage,
     sendAPIKey,
+    showExplanation,
+    setShowExplanation,
+    openExplanation,
+    closeExplanation,
+    fontResponse,
+    setFontResponse,
+    toggleModel,
+    model,
+    closeApiKeyModal,
     showPopup,
     setShowPopup,
     showLinkModal,
@@ -144,14 +173,19 @@ const Chatbot = () => {
     setApiKey,
     bgColor,
     setBgColor,
-    fontSize,
-    setFontSize,
     showSettings,
     setShowSettings,
     showApiKeyModal,
     setShowApiKeyModal,
     sendMessage,
+    toggleModel,
+    model,
     sendAPIKey,
+    showExplanation, // Add this
+    openExplanation, // Add this
+    closeExplanation, // Add this
+    fontResponse,   // This is used correctly now
+    setFontResponse, // This is used correctly now
     showPopup,
     setShowPopup,
     showLinkModal,
@@ -164,13 +198,16 @@ const Chatbot = () => {
     { name: "GeeksForGeeks", url: "https://www.geeksforgeeks.org" },
   ];
 
-  const toggleFontSize = () => {
-    setFontSize((prevSize) => (prevSize === 16 ? 20 : 16)); // Toggle between 16px and 20px
+  const [isSpinning, setIsSpinning] = useState(false);
+  const handleDuckiClick = () => {
+    setIsSpinning(true);
+    playDuckSound();
+    setTimeout(() => setIsSpinning(false), 1000); // Remove the spin class after 1 second
   };
 
   return (
-    <div className="container" style={{ backgroundColor: bgColor, fontSize: `${fontSize}px`, }} data-testid="chatbot-container">
-      <button className="settings-button" onClick={() => settings.toggleSettings(setShowSettings)}>
+    <div className="container" style={{ backgroundColor: bgColor }}>
+      <button className="settings-button" onClick={() => settings.toggleSettings(setShowSettings)} style={{ fontSize: fontResponse }}>
         ⚙️ Settings
       </button>
 
@@ -189,26 +226,19 @@ const Chatbot = () => {
         Ducki Chatbot
       </h1>
 
-      {/* Old implementation */}
-      {/* <div className="DuckiImage">
-        <ImageComponent src={Ducki} alt="Ducki" />
-      </div> */}
-
-      <button className="font-toggle-button" onClick={toggleFontSize}>
-        {fontSize === 16 ? "Increase Font Size" : "Reset Font Size"}
-      </button>
-
-      <DuckiImageToggle />
+      <div className="DuckiImage">
+        <img src={Ducki} alt="Ducki icon" />
+      </div>
 
       <div>
         {recentResponse && (
           <div>
-            <p>
+            <p style={{ fontSize: fontResponse }}>
               <strong>You:</strong> {recentResponse.user}
             </p>
-            <p>
+            <p style={{ fontSize: fontResponse }}>
               <strong>Ducki:</strong>
-              <p>{recentResponse.bot}</p>
+              <ReactMarkdown>{recentResponse.bot}</ReactMarkdown>
             </p>
           </div>
         )}
@@ -235,29 +265,85 @@ const Chatbot = () => {
 
       {showSettings && (
         <div className="settings-modal">
-          <h2>Settings</h2>
-          <p>Adjust your settings here.</p>
-          <div>
-            <label>Select Background Color:</label>
-            <button onClick={() => settings.toggleBackgroundColor(setBgColor)}>
-              Toggle to {bgColor === "#FFFFFF" ? "#33363b" : "#FFFFFF"}
-            </button>
+          <h2 className="settings-title" style={{ fontSize: fontResponse }}>
+            Settings
+          </h2>
+
+          {/* Ducki Image */}
+          <div className="duck-container">
+            <img
+              src={Ducki}
+              alt="Ducki icon"
+              className={`settings-ducki-image ${isSpinning ? "spin" : ""}`}
+              onClick={handleDuckiClick}
+            />
           </div>
+
+          <div className="settings-black-bar"></div>
+
           <div>
-            <button onClick={() => settings.openApiKeyModal(setShowApiKeyModal)}>
+            <label style={{ fontSize: fontResponse }}>Select Background Color</label>
+
+            <div className="background-toggle-buttons">
+              <button onClick={() => setBgColor("#33363b")} className="black-button" style={{ fontSize: fontResponse }}>
+                Black
+              </button>
+              <button onClick={() => setBgColor("#FFFDD0")} className="white-button" style={{ fontSize: fontResponse }}>
+                White
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label style={{ fontSize: fontResponse }}>Select Font Size</label>
+            <div className="font-size-toggle-buttons">
+              <button onClick={() => setFontResponse("12px")} className="font-size-button" style={{ fontSize: fontResponse }}>
+                Small
+              </button>
+              <button onClick={() => setFontResponse("16px")} className="font-size-button" style={{ fontSize: fontResponse }}>
+                Medium
+              </button>
+              <button onClick={() => setFontResponse("20px")} className="font-size-button" style={{ fontSize: fontResponse }}>
+                Large
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <button onClick={() => settings.openApiKeyModal(setShowApiKeyModal)} style={{ fontSize: fontResponse }}>
               Input API Key
             </button>
           </div>
-          <button onClick={() => settings.reset(setShowSettings, setShowApiKeyModal)}>
+          <div>
+            <button onClick={openExplanation} style={{ fontSize: fontResponse }} >What is this chatbot? </button>
+          </div>
+          <br />
+          <div>
+            Toggle Chat Model<br />
+            <button style={{ fontSize: fontResponse }} onClick={toggleModel}>Current Model: {model}</button>
+          </div>
+          <button onClick={() => settings.reset(setShowSettings, setShowApiKeyModal)} style={{ fontSize: fontResponse }}>
             Cancel
           </button>
         </div>
+      )}
 
+      {showExplanation && (
+        <div className="settings-modal">
+          <h2 style={{ fontSize: fontResponse }}>About Ducki Chatbot</h2>
+          <p style={{ fontSize: fontResponse }}>
+            Greetings, Thanks for using Ducki! The following is a brief explanation
+            of Ducki. The purpose of Ducki is to assist programmers like you with questions
+            related to programming.
+          </p>
+          <button style={{ fontSize: fontResponse }} onClick={closeExplanation}>Close</button>
+        </div>
       )}
 
       {showApiKeyModal && (
         <div className="settings-modal">
-          <h2>Enter API Key</h2>
+          <h2 style={{ fontSize: fontResponse }}>Enter API Key</h2>
+
           <form onSubmit={sendAPIKey}>
             <input
               type="text"
@@ -265,9 +351,9 @@ const Chatbot = () => {
               onChange={(e) => setApiKey(e.target.value)}
               placeholder="Enter your API key"
             />
-            <button type="submit">Save API Key</button>
-            <button type="button" onClick={() => settings.closeApiKeyModal(setShowApiKeyModal)}>
-              Cancel
+            <button type="submit" style={{ fontSize: fontResponse }}>Save API Key</button>
+            <button type="button" style={{ fontSize: fontResponse }} onClick={() => settings.closeApiKeyModal(setShowApiKeyModal)}>
+              Close
             </button>
           </form>
         </div>
