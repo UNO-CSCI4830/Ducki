@@ -59,6 +59,8 @@ function useChatbot() {
   const [showSettings, setShowSettings] = useState(false);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
+  const openExplanation = () => setShowExplanation(true); // add this Lawrence :)
+  const closeExplanation = () => setShowExplanation(false); // add this  Lawrence :)
   const [fontResponse, setFontResponse] = useState("16px");
   const [model, setModel] = useState("gpt-4o-mini");
 
@@ -140,6 +142,8 @@ function useChatbot() {
     toggleModel,
     model,
     closeApiKeyModal,
+    openExplanation,   // add this :) Lawrence 
+    closeExplanation, // add this :) Lawrence
   };
 }
 
@@ -271,7 +275,7 @@ const Chatbot = () => {
           </div>
           <div>
             <button onClick={openExplanation} style={{ fontSize: fontResponse }} >What is this chatbot? </button>
-          </div>
+          </div> 
           <br/>
           <div>
             Toggle Chat Model<br/>
