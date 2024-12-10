@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200">
+  <!-- Reversed Arrow Shape -->
+  <polygon points="350,100 250,40 250,60 150,60 150,140 250,140 250,160" fill="white" stroke="black" stroke-width="5"/>
+  
+  <!-- Centered Text "QUACK!" -->
+  <text x="160" y="110" font-family="Comic Sans MS" font-size="40" font-weight="bold" fill="black">
+    QUACK!
+  </text>
+</svg>
