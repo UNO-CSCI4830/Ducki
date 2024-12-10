@@ -3,34 +3,130 @@ import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import "./App.css";
 import Ducki from "./assets/ducki.ico";
+import DuckiNoise from "./assets/genericquack.mp3"
+import LinkModal from "./components/LinksModal";
+import Popup from "./components/popup"
 
-const Chatbot = () => {
+
+const playDuckSound = () => {
+  const quackSound = new Audio(DuckiNoise); //DUCKI NOISE
+  quackSound.play().catch((error) => {
+    console.error('Audio playback error:', error);
+  });
+};
+
+// Helper class for managing settings (background color and visibility)
+class Settings {
+  constructor() {
+    this.bgColor = "#33363b"; // Initial background color (dark mode)
+    this.showSettings = false;
+    this.showApiKeyModal = false;
+  }
+
+  // Methods to toggle settings and background color
+  toggleBackgroundColor(setBgColor) {
+
+    this.bgColor = this.bgColor === "white" ? "#33363b" : "white";
+    setBgColor(this.bgColor); // Update the state externally
+  }
+
+  toggleSettings(setShowSettings) {
+
+    this.showSettings = !this.showSettings;
+    setShowSettings(this.showSettings); // Update the state externally
+  }
+
+  openApiKeyModal(setShowApiKeyModal) {
+    this.showApiKeyModal = true;
+    setShowApiKeyModal(this.showApiKeyModal); // Update the state externally
+  }
+
+  closeApiKeyModal(setShowApiKeyModal) {
+    this.showApiKeyModal = false;
+    setShowApiKeyModal(this.showApiKeyModal); // Update the state externally
+  }
+
+  reset(setShowSettings, setShowApiKeyModal) {
+    this.showSettings = false;
+    this.showApiKeyModal = false;
+    setShowSettings(false);
+    setShowApiKeyModal(false); // Reset both states
+  }
+}
+
+
+class EditUserBubble {
+  openEditModal(setShowEditModal, setEditedText, currentText) {
+    setEditedText(currentText); // Pre-fill the text area
+    setShowEditModal(true);     // Show the modal
+  }
+  closeEditModal(setShowEditModal) {
+    setShowEditModal(false);
+  }
+  saveEditedMessage(setRecentResponse, editedText, setShowEditModal) {
+    setRecentResponse((prev) => ({
+      ...prev,
+      user: editedText,
+    }));
+    this.closeEditModal(setShowEditModal); // Close after saving
+  }
+  clearBothMessages(setRecentResponse, setShowEditModal) {
+    setRecentResponse({
+      user: "",
+      bot: "",
+    });
+    this.closeEditModal(setShowEditModal); // Close after clearing
+  }
+}
+
+
+// Custom hook to manage the chatbot state and logic
+function useChatbot() {
+  const [showPopup, setShowPopup] = useState(false);
+
   const [message, setMessage] = useState("");
   const [recentResponse, setRecentResponse] = useState(null);
-  const [showSettings, setShowSettings] = useState(false);
-  const [bgColor, setBgColor] = useState("#33363b");
   const [apiKey, setApiKey] = useState("");
+  const [bgColor, setBgColor] = useState("#33363b");
+  const [showSettings, setShowSettings] = useState(false);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+  const [showExplanation, setShowExplanation] = useState(false);
+  const [fontResponse, setFontResponse] = useState("16px");
+  const [model, setModel] = useState("gpt-4o-mini");
+  const editUserBubble = new EditUserBubble();
+  const [showLinkModal, setShowLinkModal] = useState(false);
+  const [editedText, setEditedText] = useState("");
+  const [showEditModal, setShowEditModal] = useState(false);
+  
+  const settings = new Settings();
+  const openExplanation = () => setShowExplanation(true);
+  const closeExplanation = () => setShowExplanation(false);
+
+
+  const models = ["gpt-4o-mini", "gpt-4", "gpt-4-turbo", "gpt-4o", "gpt-3.5-turbo"];
 
   const sendMessage = async (e) => {
     e.preventDefault();
     if (message.trim() === "") return;
 
-    setRecentResponse({
-      user: message,
-      bot: "",
-    });
+    setRecentResponse({ user: message, bot: "" });
 
     try {
       const response = await axios.post("/api/message", { text: message });
-      setRecentResponse({
-        user: message,
-        bot: response.data.response,
-      });
+      setRecentResponse({ user: message, bot: response.data.response });
+      playDuckSound();
       setMessage("");
     } catch (error) {
       console.error("Error communicating with backend", error);
+
+    } finally {
+      clearMessageBox();
     }
+  };
+
+  // function to clear Message box upon sending message to Ducki
+  const clearMessageBox = () => {
+    setMessage("");
   };
 
   const sendAPIKey = async (e) => {
@@ -44,48 +140,143 @@ const Chatbot = () => {
     try {
       const response = await axios.post("/api/api_key", { api_key: apiKey });
       console.log("API key sent successfully:", response.data.message);
-      setShowApiKeyModal(false);
-      setApiKey(""); // Clear the API key input field after submission
+      settings.closeApiKeyModal(setShowApiKeyModal);
+      setApiKey("");
+
+      setShowPopup(true); // Show the confirmation popup
     } catch (error) {
       console.error("Error sending API key to backend", error);
     }
   };
 
-  const toggleSettings = () => {
-    setShowSettings(!showSettings);
-  };
+  const toggleModel = async () => {
+    const nextModelIndex = (models.indexOf(model) + 1) % models.length;
+    const newModel = models[nextModelIndex];
+    setModel(newModel);
 
-  const closeSettings = () => {
-    setShowSettings(false);
-  };
-
-  const openApiKeyModal = () => {
-    setShowApiKeyModal(true);
+    try {
+      const response = await axios.post("/api/set_model", { model: newModel });
+      console.log("Model changed successfully:", response.data.message);
+    } catch (error) {
+      console.error("Error changing model:", error);
+    }
   };
 
   const closeApiKeyModal = () => {
     setShowApiKeyModal(false);
-    setApiKey(""); // Clear API key input on cancel
+    setApiKey("");
   };
 
-  const handleApiKeyChange = (e) => {
-    setApiKey(e.target.value);
-  };
+  return {
+    message,
+    setMessage,
+    recentResponse,
+    setRecentResponse,
+    settings,
+    apiKey,
+    setApiKey,
+    bgColor,
+    setBgColor,
+    showSettings,
+    setShowSettings,
+    showApiKeyModal,
+    setShowApiKeyModal,
+    sendMessage,
+    sendAPIKey,
+    showExplanation,
+    setShowExplanation,
+    openExplanation,
+    closeExplanation,
+    fontResponse,
+    setFontResponse,
+    toggleModel,
+    model,
+    closeApiKeyModal,
+    editUserBubble,
+    editedText,
+    setEditedText,
+    showEditModal,
+    setShowEditModal,
+    showPopup,
+    setShowPopup,
+    showLinkModal,
+    setShowLinkModal
 
-  const toggleBackgroundColor = () => {
-    setBgColor((prevColor) => (prevColor === "white" ? "#33363b" : "white"));
+  };
+}
+
+const Chatbot = () => {
+  const {
+    message,
+    setMessage,
+    recentResponse,
+    setRecentResponse,
+    settings,
+    apiKey,
+    setApiKey,
+    bgColor,
+    setBgColor,
+    showSettings,
+    setShowSettings,
+    showApiKeyModal,
+    setShowApiKeyModal,
+    sendMessage,
+    toggleModel,
+    model,
+    sendAPIKey,
+    showExplanation, // Add this
+    openExplanation, // Add this
+    closeExplanation, // Add this
+    fontResponse,   // This is used correctly now
+    setFontResponse,
+    showPopup,
+    setShowPopup,
+    showLinkModal,
+    setShowLinkModal,// This is used correctly now
+    editUserBubble,
+    editedText,
+    setEditedText,
+    showEditModal,
+    setShowEditModal,
+  } = useChatbot();
+
+  
+ 
+
+
+
+  const externalLinks = [
+    { name: "GitHub", url: "https://github.com/UNO-CSCI4830/Ducki/" },
+    { name: "Stack Overflow", url: "https://stackoverflow.com" },
+    { name: "GeeksForGeeks", url: "https://www.geeksforgeeks.org" },
+  ];
+
+  const [isSpinning, setIsSpinning] = useState(false);
+  const handleDuckiClick = () => {
+    setIsSpinning(true);
+    playDuckSound();
+    setTimeout(() => setIsSpinning(false), 1000); // Remove the spin class after 1 second
   };
 
   return (
     <div className="container" style={{ backgroundColor: bgColor }}>
-      <button className="settings-button" onClick={toggleSettings}>
+      <button className="settings-button" onClick={() => settings.toggleSettings(setShowSettings)} style={{ fontSize: fontResponse }}>
         ⚙️ Settings
       </button>
 
-      <h1
-        align="center"
-        style={{ color: bgColor === "white" ? "black" : "white" }}
+      <button
+        onClick={() => setShowLinkModal(true)}
+        className="open-links-button"
       >
+        Useful Links
+      </button>
+
+      {showLinkModal && (
+        <LinkModal links={externalLinks} onClose={() => setShowLinkModal(false)} />
+      )}
+
+      <h1 align="center" style={{ color: bgColor === "#FFFFFF" ? "black" : "#ffc438" }}>
+        
         Ducki Chatbot
       </h1>
 
@@ -93,66 +284,176 @@ const Chatbot = () => {
         <img src={Ducki} alt="Ducki icon" />
       </div>
 
-      <div>
-        {recentResponse && (
+      
+      {showEditModal && (
+        <div className="edit-modal">
+          <h2>Edit Your Message</h2>
+          <textarea
+            value={editedText}
+            onChange={(e) => setEditedText(e.target.value)}
+          />
           <div>
-            <p>
-              <strong>You:</strong> {recentResponse.user}
-            </p>
-            <p>
-              <strong>Ducki:</strong>
-              <ReactMarkdown>{recentResponse.bot}</ReactMarkdown>
-            </p>
+            <button onClick={() => editUserBubble.clearBothMessages(setRecentResponse, setShowEditModal)}>
+              Clear
+            </button>
+            <button onClick={() => editUserBubble.saveEditedMessage(setRecentResponse, editedText, setShowEditModal)}>
+              Send
+            </button>
+            <button onClick={() => editUserBubble.closeEditModal(setShowEditModal)}>
+              Cancel
+            </button>
           </div>
-        )}
-      </div>
+        </div>
+      )} 
+
+      {recentResponse && (recentResponse.user || recentResponse.bot) && (
+        <div className="chat-container">
+          <div className="chat-bubble user-bubble">
+            <strong>You:</strong> {recentResponse.user}
+          </div>
+          <button
+            className="edit-button-user"
+            onClick={() =>
+              editUserBubble.openEditModal(setShowEditModal, setEditedText, recentResponse.user)
+            }
+          >
+            Edit
+          </button>
+          <div className="chat-bubble bot-bubble">
+            <strong>Ducki:</strong> <ReactMarkdown>{recentResponse.bot}</ReactMarkdown>
+          </div>
+        </div>
+      )}
 
       <div className="bottom-div">
         <form align="center" onSubmit={sendMessage}>
-          <input
-            type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Type a message to Ducki"
-          />
-          <button type="submit">Send</button>
+          <div className="input-container">
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && e.shiftKey) {
+                  e.preventDefault();
+                  setMessage((prev) => prev + "\n");
+                }
+              }}
+              placeholder="Type a message to Ducki"
+            />
+            <button type="submit">Send</button>
+          </div>
         </form>
       </div>
 
       {showSettings && (
         <div className="settings-modal">
-          <h2>Settings</h2>
-          <p>Adjust your settings here.</p>
+          <h2 className="settings-title" style={{ fontSize: fontResponse }}>
+            Settings
+          </h2>
+
+          {/* Ducki Image */}
+          <div className="duck-container">
+            <img
+              src={Ducki}
+              alt="Ducki icon"
+              className={`settings-ducki-image ${isSpinning ? "spin" : ""}`}
+              onClick={handleDuckiClick}
+            />
+          </div>
+
+          <div className="settings-black-bar"></div>
+
           <div>
-            <label>Select Background Color:</label>
-            <button onClick={toggleBackgroundColor}>
-              Toggle to {bgColor === "white" ? "#33363b" : "White"}
+
+            <label style={{ fontSize: fontResponse }}>Select Background Color</label>
+
+            <div className="background-toggle-buttons">
+              <button onClick={() => setBgColor("#33363b")} className="black-button" style={{ fontSize: fontResponse }}>
+                Black
+              </button>
+              <button onClick={() => setBgColor("#FFFDD0")} className="white-button" style={{ fontSize: fontResponse }}>
+                White
+              </button>
+            </div>
+          </div>
+
+          <div>
+
+            <label style={{ fontSize: fontResponse }}>Select Font Size</label>
+
+            <div className="font-size-toggle-buttons">
+              <button onClick={() => setFontResponse("12px")} className="font-size-button" style={{ fontSize: fontResponse }}>
+                Small
+              </button>
+              <button onClick={() => setFontResponse("16px")} className="font-size-button" style={{ fontSize: fontResponse }}>
+                Medium
+              </button>
+              <button onClick={() => setFontResponse("20px")} className="font-size-button" style={{ fontSize: fontResponse }}>
+                Large
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <button onClick={() => settings.openApiKeyModal(setShowApiKeyModal)} style={{ fontSize: fontResponse }}>
+              Input API Key
             </button>
           </div>
           <div>
-            <button onClick={openApiKeyModal}>Input API Key</button>
+            <button onClick={openExplanation} style={{ fontSize: fontResponse }} >What is this chatbot? </button>
           </div>
-          <button onClick={closeSettings}>Cancel</button>
+
+
+          <br />
+          <div>
+            Toggle Chat Model<br />
+
+            <button style={{ fontSize: fontResponse }} onClick={toggleModel}>Current Model: {model}</button>
+          </div>
+          <button onClick={() => settings.reset(setShowSettings, setShowApiKeyModal)} style={{ fontSize: fontResponse }}>
+            Cancel
+          </button>
+        </div>
+      )}
+
+      {showExplanation && (
+        <div className="settings-modal">
+          <h2 style={{ fontSize: fontResponse }}>About Ducki Chatbot</h2>
+          <p style={{ fontSize: fontResponse }}>
+            Greetings, Thanks for using Ducki! The following is a brief explanation
+            of Ducki. The purpose of Ducki is to assist programmers like you with questions
+            related to programming.
+          </p>
+          <button style={{ fontSize: fontResponse }} onClick={closeExplanation}>Close</button>
         </div>
       )}
 
       {showApiKeyModal && (
         <div className="settings-modal">
-          <h2>Enter API Key</h2>
+          <h2 style={{ fontSize: fontResponse }}>Enter API Key</h2>
+
           <form onSubmit={sendAPIKey}>
             <input
               type="text"
               value={apiKey}
-              onChange={handleApiKeyChange}
+              onChange={(e) => setApiKey(e.target.value)}
               placeholder="Enter your API key"
             />
-            <button type="submit">Save API Key</button>
-            <button type="button" onClick={closeApiKeyModal}>
-              Cancel
+            <button type="submit" style={{ fontSize: fontResponse }}>Save API Key</button>
+
+            <button type="button" style={{ fontSize: fontResponse }} onClick={() => settings.closeApiKeyModal(setShowApiKeyModal)}>
+
+              Close
             </button>
           </form>
         </div>
       )}
+      {showPopup && (
+        <Popup
+          message="API Key Successfully Submitted!"
+          onClose={() => setShowPopup(false)} // Hide the popup on dismiss
+        />
+      )}
+
     </div>
   );
 };

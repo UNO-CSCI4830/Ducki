@@ -1,4 +1,3 @@
-
 .App {
   text-align: center;
 }
@@ -74,6 +73,82 @@ input[type=text] {
   }
 }
 
+.settings-ducki-image {
+  top: 10px; 
+  right: 10px;  
+  width: 3em; /* Set the width of the Ducki image */
+  height: auto; /* Ensure the height maintains aspect ratio */
+  cursor: pointer;
+  position: absolute;
+  bottom: 1em; /* Adjust this to ensure the feet align with the black bar */
+  z-index: 1100; 
+  cursor: pointer;
+  transition: transform 0.5s ease-in-out;
+}
+.settings-ducki-image-wrapper {
+  position: absolute;
+  top: 10px; /* Adjust this for the distance from the top */
+  right: 10px; /* Adjust this for the distance from the right */
+  z-index: 1100;
+}
+
+.settings-ducki-image.spin {
+  animation: spin 1s linear; 
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* General modal styling */
+.settings-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 30px; /* Increased padding for better spacing */
+  border-radius: 10px; /* Smooth rounded corners */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15); /* Stronger shadow for depth */
+  z-index: 1000;
+  max-width: 400px; /* Constrain modal width */
+  text-align: left;
+  overflow: visible;
+  
+}
+
+
+
+/* Title styling */
+.settings-modal h2 {
+  margin-top: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Text inside the modal */
+.settings-modal p {
+  font-size: 14px;
+  color: #555;
+}
+
+
+.settings-black-bar {
+  width: 100%; /* Full width of the modal */
+  height: 0.3em; 
+  background-color: black; /* Black background color */
+  display: flex;
+  align-items: center; 
+  justify-content: center; 
+  margin-top: 10px; 
+  border-radius: 5px; 
+  margin-bottom: 1em;
+}
 /* Settings Button */
 .settings-button {
   position: absolute;
@@ -91,26 +166,67 @@ input[type=text] {
 .settings-button:hover {
   background-color: #45a049;
 }
+.settings-modal input[type="text"] {
+  width: 100%; /* Make the input field take up all available width */
+  max-width: 100%; /* Ensure it doesn't exceed the modal's width */
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-sizing: border-box; /* Include padding and borders in the width calculation */
+  margin-top: 10px; /* Space above the input field */
+}
 
-/* Modal (popup) styling */
-.settings-modal {
+.explanation-modal {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
   z-index: 1000;
+  max-width: 400px;
+  text-align: left;
 }
 
-.settings-modal h2 {
-  margin-top: 0;
+.background-toggle-buttons {
+  display: flex; /* Arrange buttons in a row */
+  gap: 10px; /* Add spacing between buttons */
+  margin-top: 10px; /* Space from the label */
 }
 
+.black-button,
+.white-button {
+  width: 100px; /* Make both buttons the same width */
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.black-button {
+  background-color: #33363b; /* Dark color */
+  color: white;
+}
+
+.white-button {
+  background-color: white;
+  color: black;
+  border: 1px solid #ccc; /* Add a subtle border for the white button */
+}
+
+.black-button:hover,
+.white-button:hover {
+  transform: scale(1.05); /* Slight enlarge on hover */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Shadow on hover */
+}
+/* Buttons inside the modal */
 .settings-modal button {
-  background-color: #f44336; /* Red color */
+  background-color: #33363b; /* Red color */
   color: white;
   border: none;
   padding: 10px;
@@ -120,11 +236,313 @@ input[type=text] {
   font-size: 14px; /* Adjust as needed */
 }
 
-/* Hover Effect: Change the color when mouse is over the button */
+
+.font-size-toggle-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.font-size-button {
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  background-color: #33363b;
+  color: white;
+}
+
+.font-size-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Hover effect on the modal buttons */
 .settings-modal button:hover {
   background-color: #e53935; /* Darker red color on hover */
   transform: scale(1.05);  /* Slightly enlarge the button on hover */
   transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition */
 }
 
+.input-container {
+  display: flex;
+  align-items: center; /* Vertically align items */
+  gap: 10px; /* Space between the textarea and button */
+}
+
+textarea {
+  width: 66vw;
+  height: 5.5vh; /* Explicit height */
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  resize: none;
+  background-color: #fee88f;
+  box-sizing: border-box; /* Include padding in height calculation */
+  line-height: 1.2; /* Match the line height of the button */
+}
+
+.input-container button {
+  height: 3.4vh; /* Adjust slightly to match the visual height of the textarea */
+  padding: 0 15px; /* Adjust side padding */
+  font-size: 16px;
+  background-color: #ffcc00;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center; /* Center text vertically inside the button */
+  justify-content: center; /* Center text horizontally inside the button */
+}
+
+.input-container button:hover {
+  background-color: #ffaa00; /* Slightly darker color on hover */
+}
+
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.popup-content button {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.popup-content button:hover {
+  background-color: #0056b3;
+}
+
+.link-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.link-modal-content {
+  background: #33363b;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.link-button {
+  margin: 10px 0;
+  padding: 10px 15px;
+  background-color: #ffd866;
+  color: #33363b;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.link-button:hover {
+  background-color: #ffc438;
+}
+
+.close-button {
+  margin-top: 20px;
+  padding: 10px 15px;
+  background-color: #d9534f;
+  color: #33363b;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  background-color: #c9302c;
+}
+
+.open-links-button {
+  background-color: #ffd866; 
+  color: #33363b; 
+  border: none; 
+  padding: 10px 20px; 
+  font-size: 16px; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  transition: background-color 0.3s ease; 
+  margin-top: 0px;
+  display: flex; 
+  text-align: center;
+  position: fixed;
+  right: 20px;
+  top: 140px;
+}
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  height: 500px; 
+  width: 800px;
+  overflow-y: scroll;
+}
+
+.user-bubble {
+  max-width: 60%;
+  padding: 10px;
+  background-color: #4CAF50;  
+  color: white;
+  border-radius: 15px;
+  font-size: 16px;
+  line-height: 1.4;
+  align-self: flex-end;  
+  word-wrap: break-word; 
+  white-space: normal; 
+}
+
+.bot-bubble {
+  max-width: 70%;
+  max-height: 40vh;
+  overflow-y: scroll;
+  padding: 10px;
+  background-color: #f1f1f1;  
+  color: black;
+  border-radius: 15px;
+  font-size: 16px;
+  line-height: 1.4;
+  align-self: flex-start;
+  word-wrap: break-word; 
+  white-space: normal; 
+}
+
+/* Style the edit button next to the user message */
+.edit-button-user {
+  color: #0aa4f7; 
+  background-color: transparent;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.9em;
+  padding: 5px 10px;
+  margin-left: 10px;
+  cursor: pointer;
+  align-self: flex-end;  
+  transition: 0.3s ease;
+}
+
+.edit-button-user:hover {
+  text-decoration: underline;
+}
+
+/* Modal Overlay */
+.edit-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+    background-color: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999; 
+}
+
+/* Modal Content */
+.edit-modal > div {
+  background: #2f3136;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 400px;
+  width: 90%;
+  color: #ffffff;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
+}
+
+/* Modal Header */
+.edit-modal h2 {
+  margin-top: 0;
+  font-size: 1.5em;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
+}
+
+/* Edit Textarea */
+.edit-modal textarea {
+  width: 100%;
+  height: 100px;
+  background: #484b51;
+  border: none;
+  border-radius: 5px;
+  color: #ffffff;
+  padding: 10px;
+  resize: vertical;
+  margin-top: 10px;
+  font-size: 1em;
+}
+
+/* Modal Buttons Container */
+.edit-modal > div > div {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+}
+
+/* Modal Buttons */
+.edit-modal button {
+  background-color: #4caf50;
+  border: none;
+  border-radius: 5px;
+  color: #ffffff;
+  padding: 8px 12px;
+  font-size: 0.9em;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.edit-modal button:hover {
+  background-color: #45a049;
+}
+
+/* Individual Buttons with Different Colors */
+.edit-modal button:nth-child(1) { /* Clear button */
+  background-color: #d9534f;
+}
+
+.edit-modal button:nth-child(1):hover {
+  background-color: #c9302c;
+}
+
+.edit-modal button:nth-child(3) { /* Cancel button */
+  background-color: #808080;
+}
+
+.edit-modal button:nth-child(3):hover {
+  background-color: #666666;
+}
 

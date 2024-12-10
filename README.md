@@ -13,3 +13,6 @@ Ducki is an open-source code assistant designed with the developer in mind. The 
 5. Pause the process with `CTL+Z` and send to the background with the `bg` command
 
 From here, you should be able to interact with Ducki [here](http://localhost:3000/). Happy coding!
+
+## The Mission
+Our mission as the developers of Ducki is to provide the user a smarter way to rubber duck program. We want this to be a free, open source, and public project. We want everyone to be able to add to Ducki at their own will and tailor the context to their desire. To help ensure that, we have worked hard to make the installation and deployment as straight-forward as we could while also trying to minimize dependencies. We really hope that this will benefit developers, old and new. 

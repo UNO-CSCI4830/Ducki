@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
 from chatbot import Chatbot
-from apiKeyHandler import writeKey
+from apiKeyHandler import apiKeyHandler
 from dotenv import load_dotenv
 import os
 
@@ -10,16 +10,16 @@ app = FastAPI()
 
 # Global variable to hold the Chatbot instance
 ducki = None
-
+key_handler = apiKeyHandler()
 # Function to initialize the Chatbot with the current API key from .env
-def initialize_ducki():
+def initialize_ducki(model="gpt-4o-mini"):
     global ducki
     load_dotenv()  # Load environment variables
 
     api_key = os.environ.get("OPENAI_API_KEY")
     if api_key:
         # initialize the chatbot with the API key from the environment
-        ducki = Chatbot(api_key=api_key)
+        ducki = Chatbot(api_key=api_key, model=model)
     else:
         # if no API key is found, don't initialize the chatbot yet
         ducki = None
@@ -33,6 +33,23 @@ class Message(BaseModel):
 class APIKey(BaseModel):
     api_key: str
 
+class Model(BaseModel):
+    model: str
+
+# Endpoint for setting the model for the chatbot object
+@app.post("/api/set_model")
+async def set_model(model: Model):
+    global ducki
+
+    try:
+        ducki.set_model(model.model)
+        initialize_ducki(model.model)
+        return {"message": f"Model set to {model.model}"}
+    except Exception as e:
+        print(f"Error setting model: {e}")
+        raise HTTPException(status_code=500, detail="Error changing model")
+
+# Endpoint for receiving the API key
 @app.post("/api/api_key")
 async def get_api_key(api_key: APIKey):
     global ducki
@@ -40,7 +57,7 @@ async def get_api_key(api_key: APIKey):
     if api_key.api_key:
         print("Key received!")
         # Write the new API key to the .env file
-        writeKey(api_key.api_key)
+        key_handler.writeKey(api_key.api_key)
 
         # Reload environment variables and re-initialize ducki with the new API key
         load_dotenv()  
@@ -50,6 +67,7 @@ async def get_api_key(api_key: APIKey):
     else:
         raise HTTPException(status_code=400, detail="API key is required")
 
+# Endpoint for receiving the message and sending the response
 @app.post("/api/message")
 async def receive_message(message: Message):
     global ducki
