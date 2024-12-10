@@ -4,6 +4,8 @@ import ReactMarkdown from "react-markdown";
 import "./App.css";
 import Ducki from "./assets/ducki.ico";
 import DuckiNoise from "./assets/genericquack.mp3"
+import LinkModal from "./components/LinksModal";
+import Popup from "./components/popup"
 
 
 const playDuckSound = () => {
@@ -23,12 +25,14 @@ class Settings {
 
   // Methods to toggle settings and background color
   toggleBackgroundColor(setBgColor) {
-    this.bgColor = this.bgColor === "white" ? "#33363b" : "white"; 
+
+    this.bgColor = this.bgColor === "white" ? "#33363b" : "white";
     setBgColor(this.bgColor); // Update the state externally
   }
 
   toggleSettings(setShowSettings) {
-    this.showSettings = !this.showSettings; 
+
+    this.showSettings = !this.showSettings;
     setShowSettings(this.showSettings); // Update the state externally
   }
 
@@ -49,6 +53,7 @@ class Settings {
     setShowApiKeyModal(false); // Reset both states
   }
 }
+
 
 class EditUserBubble {
   openEditModal(setShowEditModal, setEditedText, currentText) {
@@ -74,8 +79,11 @@ class EditUserBubble {
   }
 }
 
+
 // Custom hook to manage the chatbot state and logic
 function useChatbot() {
+  const [showPopup, setShowPopup] = useState(false);
+
   const [message, setMessage] = useState("");
   const [recentResponse, setRecentResponse] = useState(null);
   const [apiKey, setApiKey] = useState("");
@@ -85,11 +93,15 @@ function useChatbot() {
   const [showExplanation, setShowExplanation] = useState(false);
   const [fontResponse, setFontResponse] = useState("16px");
   const [model, setModel] = useState("gpt-4o-mini");
+  const editUserBubble = new EditUserBubble();
+  const [showLinkModal, setShowLinkModal] = useState(false);
   const [editedText, setEditedText] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
-
+  
   const settings = new Settings();
-  const editUserBubble = new EditUserBubble();
+  const openExplanation = () => setShowExplanation(true);
+  const closeExplanation = () => setShowExplanation(false);
+
 
   const models = ["gpt-4o-mini", "gpt-4", "gpt-4-turbo", "gpt-4o", "gpt-3.5-turbo"];
 
@@ -106,7 +118,15 @@ function useChatbot() {
       setMessage("");
     } catch (error) {
       console.error("Error communicating with backend", error);
+
+    } finally {
+      clearMessageBox();
     }
+  };
+
+  // function to clear Message box upon sending message to Ducki
+  const clearMessageBox = () => {
+    setMessage("");
   };
 
   const sendAPIKey = async (e) => {
@@ -122,6 +142,8 @@ function useChatbot() {
       console.log("API key sent successfully:", response.data.message);
       settings.closeApiKeyModal(setShowApiKeyModal);
       setApiKey("");
+
+      setShowPopup(true); // Show the confirmation popup
     } catch (error) {
       console.error("Error sending API key to backend", error);
     }
@@ -163,6 +185,8 @@ function useChatbot() {
     sendAPIKey,
     showExplanation,
     setShowExplanation,
+    openExplanation,
+    closeExplanation,
     fontResponse,
     setFontResponse,
     toggleModel,
@@ -173,6 +197,11 @@ function useChatbot() {
     setEditedText,
     showEditModal,
     setShowEditModal,
+    showPopup,
+    setShowPopup,
+    showLinkModal,
+    setShowLinkModal
+
   };
 }
 
@@ -199,7 +228,11 @@ const Chatbot = () => {
     openExplanation, // Add this
     closeExplanation, // Add this
     fontResponse,   // This is used correctly now
-    setFontResponse, // This is used correctly now
+    setFontResponse,
+    showPopup,
+    setShowPopup,
+    showLinkModal,
+    setShowLinkModal,// This is used correctly now
     editUserBubble,
     editedText,
     setEditedText,
@@ -209,6 +242,15 @@ const Chatbot = () => {
 
   
  
+
+
+
+  const externalLinks = [
+    { name: "GitHub", url: "https://github.com/UNO-CSCI4830/Ducki/" },
+    { name: "Stack Overflow", url: "https://stackoverflow.com" },
+    { name: "GeeksForGeeks", url: "https://www.geeksforgeeks.org" },
+  ];
+
   const [isSpinning, setIsSpinning] = useState(false);
   const handleDuckiClick = () => {
     setIsSpinning(true);
@@ -222,7 +264,19 @@ const Chatbot = () => {
         ⚙️ Settings
       </button>
 
-      <h1 align="center" style={{ color: bgColor === "white" ? "black" : "white" }} >
+      <button
+        onClick={() => setShowLinkModal(true)}
+        className="open-links-button"
+      >
+        Useful Links
+      </button>
+
+      {showLinkModal && (
+        <LinkModal links={externalLinks} onClose={() => setShowLinkModal(false)} />
+      )}
+
+      <h1 align="center" style={{ color: bgColor === "#FFFFFF" ? "black" : "#ffc438" }}>
+        
         Ducki Chatbot
       </h1>
 
@@ -230,37 +284,6 @@ const Chatbot = () => {
         <img src={Ducki} alt="Ducki icon" />
       </div>
 
-      {recentResponse && (recentResponse.user || recentResponse.bot) && (
-        <div className="chat-container">
-          <div className="chat-bubble user-bubble">
-            <strong>You:</strong> {recentResponse.user}
-          </div>
-          <button
-            className="edit-button-user"
-            onClick={() =>
-              editUserBubble.openEditModal(setShowEditModal, setEditedText, recentResponse.user)
-            }
-          >
-            Edit
-          </button>
-          <div className="chat-bubble bot-bubble">
-            <strong>Ducki:</strong> <ReactMarkdown>{recentResponse.bot}</ReactMarkdown>
-          </div>
-        </div>
-      )}
-
-      <div className="bottom-div">
-        <form align="center" onSubmit={sendMessage}>
-          <input
-            type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Type a message to Ducki"
-            style={{ fontSize: fontResponse }} // Use fontResponse here
-          />
-          <button type="submit" style={{ fontSize: fontResponse }}>Send</button>
-        </form>
-      </div>
       
       {showEditModal && (
         <div className="edit-modal">
@@ -283,26 +306,65 @@ const Chatbot = () => {
         </div>
       )} 
 
+      {recentResponse && (recentResponse.user || recentResponse.bot) && (
+        <div className="chat-container">
+          <div className="chat-bubble user-bubble">
+            <strong>You:</strong> {recentResponse.user}
+          </div>
+          <button
+            className="edit-button-user"
+            onClick={() =>
+              editUserBubble.openEditModal(setShowEditModal, setEditedText, recentResponse.user)
+            }
+          >
+            Edit
+          </button>
+          <div className="chat-bubble bot-bubble">
+            <strong>Ducki:</strong> <ReactMarkdown>{recentResponse.bot}</ReactMarkdown>
+          </div>
+        </div>
+      )}
+
+      <div className="bottom-div">
+        <form align="center" onSubmit={sendMessage}>
+          <div className="input-container">
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && e.shiftKey) {
+                  e.preventDefault();
+                  setMessage((prev) => prev + "\n");
+                }
+              }}
+              placeholder="Type a message to Ducki"
+            />
+            <button type="submit">Send</button>
+          </div>
+        </form>
+      </div>
+
       {showSettings && (
         <div className="settings-modal">
           <h2 className="settings-title" style={{ fontSize: fontResponse }}>
-           Settings
+            Settings
           </h2>
 
           {/* Ducki Image */}
           <div className="duck-container">
-            <img 
-              src={Ducki} 
-              alt="Ducki icon" 
-              className={`settings-ducki-image ${isSpinning ? "spin" : ""}`} 
-              onClick={handleDuckiClick} 
+            <img
+              src={Ducki}
+              alt="Ducki icon"
+              className={`settings-ducki-image ${isSpinning ? "spin" : ""}`}
+              onClick={handleDuckiClick}
             />
           </div>
 
           <div className="settings-black-bar"></div>
 
           <div>
-          <label style={{ fontSize: fontResponse }}>Select Background Color</label>
+
+            <label style={{ fontSize: fontResponse }}>Select Background Color</label>
 
             <div className="background-toggle-buttons">
               <button onClick={() => setBgColor("#33363b")} className="black-button" style={{ fontSize: fontResponse }}>
@@ -315,7 +377,9 @@ const Chatbot = () => {
           </div>
 
           <div>
-          <label style={{ fontSize: fontResponse }}>Select Font Size</label>
+
+            <label style={{ fontSize: fontResponse }}>Select Font Size</label>
+
             <div className="font-size-toggle-buttons">
               <button onClick={() => setFontResponse("12px")} className="font-size-button" style={{ fontSize: fontResponse }}>
                 Small
@@ -337,9 +401,12 @@ const Chatbot = () => {
           <div>
             <button onClick={openExplanation} style={{ fontSize: fontResponse }} >What is this chatbot? </button>
           </div>
-          <br/>
+
+
+          <br />
           <div>
-            Toggle Chat Model<br/>
+            Toggle Chat Model<br />
+
             <button style={{ fontSize: fontResponse }} onClick={toggleModel}>Current Model: {model}</button>
           </div>
           <button onClick={() => settings.reset(setShowSettings, setShowApiKeyModal)} style={{ fontSize: fontResponse }}>
@@ -372,12 +439,21 @@ const Chatbot = () => {
               placeholder="Enter your API key"
             />
             <button type="submit" style={{ fontSize: fontResponse }}>Save API Key</button>
-            <button type="button"style={{ fontSize: fontResponse }} onClick={() => settings.closeApiKeyModal(setShowApiKeyModal)}>
+
+            <button type="button" style={{ fontSize: fontResponse }} onClick={() => settings.closeApiKeyModal(setShowApiKeyModal)}>
+
               Close
             </button>
           </form>
         </div>
       )}
+      {showPopup && (
+        <Popup
+          message="API Key Successfully Submitted!"
+          onClose={() => setShowPopup(false)} // Hide the popup on dismiss
+        />
+      )}
+
     </div>
   );
 };
