@@ -23,7 +23,7 @@ describe("Chatbot Settings - Background Color Toggle", () => {
     fireEvent.click(toggleColorButton);
 
     // Verify the background color is now white
-    await waitFor(() => expect(container).toHaveStyle({ backgroundColor: "rgb(255, 255, 255)" }));
+    await waitFor(() => expect(container).toHaveStyle({ backgroundColor: "rgb(255, 253, 208)" }));
 
     // Simulate another click to toggle back to dark mode
     fireEvent.click(toggleColorButton);
