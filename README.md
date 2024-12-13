@@ -17,3 +17,6 @@ From here, you should be able to interact with Ducki [here](http://localhost:300
 
 ## The Mission
 Our mission as the developers of Ducki is to provide the user a smarter way to rubber duck program. We want this to be a free, open source, and public project. We want everyone to be able to add to Ducki at their own will and tailor the context to their desire. To help ensure that, we have worked hard to make the installation and deployment as straight-forward as we could while also trying to minimize dependencies. We really hope that this will benefit developers, old and new. 
+
+## Requirements
+The only requirement to run this application is Docker! The rest should be handled for you! If you choose to run it locally, you can see the `backend/requirements.txt` file and the `frontend/package.json` file. These should have all of the requirements listed for the application.
