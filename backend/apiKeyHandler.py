@@ -28,6 +28,7 @@ class apiKeyHandler:
         except FileNotFoundError as e:
             return None
 
+
     def writeKey(self,  key : str):
         """Method designed to write and store key in dotenv file"""
         with open('.env','w') as file:
