@@ -42,6 +42,23 @@ class APIKey(BaseModel):
     api_key: str
 
 
+class Model(BaseModel):
+    model: str
+
+# Endpoint for setting the model for the chatbot object
+@app.post("/api/set_model")
+async def set_model(model: Model):
+    global ducki
+
+    try:
+        ducki.set_model(model.model)
+        initialize_ducki(model.model)
+        return {"message": f"Model set to {model.model}"}
+    except Exception as e:
+        print(f"Error setting model: {e}")
+        raise HTTPException(status_code=500, detail="Error changing model")
+
+# Endpoint for receiving the API key
 @app.post("/api/api_key")
 async def get_api_key(api_key: APIKey):
     global ducki
@@ -55,9 +72,11 @@ async def get_api_key(api_key: APIKey):
        
         success = {"message": "API key received successfully"}
         return JSONResponse(content={"message": success}, status_code=200)
+
     else:
         raise HTTPException(status_code=400, detail="API key is required")
 
+# Endpoint for receiving the message and sending the response
 @app.post("/api/message")
 async def receive_message(message: Message):
     global ducki
